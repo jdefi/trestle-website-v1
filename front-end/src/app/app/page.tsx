@@ -1,18 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useActiveAccount } from "thirdweb/react";
+import { useAccount } from "wagmi";
 import { useContracts } from "@/hooks/useContracts";
 import { LINKS } from "@/config/contracts";
 
 export default function AppDashboard() {
-  const account = useActiveAccount();
-  const isConnected = !!account;
-  const address = account?.address;
+  const { address, isConnected } = useAccount();
   const { nativeBalance, hNOBTBalance, brtBalance } = useContracts();
 
   const [copied, setCopied] = useState(false);
-  const refLink = address ? `${window.location.origin}/verify?ref=${address}` : "";
+  const refLink = address ? `${typeof window !== "undefined" ? window.location.origin : ""}/verify?ref=${address}` : "";
 
   const copyRef = () => {
     if (!refLink) return;
@@ -35,7 +33,7 @@ export default function AppDashboard() {
             <div className="mt-3 space-y-2">
               <div className="flex justify-between">
                 <span>MATIC</span>
-                <span className="font-bold">{parseFloat(nativeBalance).toFixed(4)}</span>
+                <span className="font-bold">{nativeBalance}</span>
               </div>
               <div className="flex justify-between">
                 <span>hNOBT</span>
@@ -51,7 +49,6 @@ export default function AppDashboard() {
             </p>
           </div>
 
-          {/* Referral */}
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <h3 className="font-semibold text-sm mb-2">Referral Link</h3>
             <p className="text-xs text-gray-500 mb-2">Share this link — new users get source-based bonus multipliers.</p>
@@ -76,7 +73,6 @@ export default function AppDashboard() {
             ))}
           </div>
 
-          {/* Telegram Mini App Link */}
           <a href={LINKS.telegramApp} target="_blank"
             className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-4 hover:border-emerald-300 transition">
             <div>

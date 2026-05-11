@@ -1,10 +1,8 @@
 "use client";
 
-import { getContract } from "thirdweb";
-import { useActiveAccount, useReadContract, useSendTransaction, useWalletBalance } from "thirdweb/react";
-import { client, chain } from "@/config/web3";
+import { useAccount, useBalance, useReadContract, useWriteContract } from "wagmi";
+import { type Address } from "viem";
 import { CONTRACTS } from "@/config/contracts";
-import { prepareContractCall } from "thirdweb";
 
 const ERC20_ABI = [
   { inputs: [{ name: "account", type: "address" }], name: "balanceOf", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
@@ -32,52 +30,49 @@ const MARKETPLACE_ABI = [
   { inputs: [], name: "listingCount", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
 ] as const;
 
-const hNOBT = () => getContract({ client, chain, address: CONTRACTS.amoy.hNOBT, abi: ERC20_ABI });
-const brt = () => getContract({ client, chain, address: CONTRACTS.amoy.broilerPlus, abi: ERC20_ABI });
-const tier1 = () => getContract({ client, chain, address: CONTRACTS.amoy.tier1Staking, abi: STAKING_ABI });
-const tier2 = () => getContract({ client, chain, address: CONTRACTS.amoy.tier2Staking, abi: STAKING_ABI });
-const tier3 = () => getContract({ client, chain, address: CONTRACTS.amoy.tier3Vault, abi: TIER3_ABI });
-const marketplace = () => getContract({ client, chain, address: CONTRACTS.amoy.marketplaceCore, abi: MARKETPLACE_ABI });
+const PLACEHOLDER = "0x...";
+const isReal = (a: string) => a !== PLACEHOLDER && !a.startsWith("0x0000");
+
+const hNOBT = CONTRACTS.amoy.hNOBT as Address;
+const brt = CONTRACTS.amoy.broilerPlus as Address;
+const tier1Addr = CONTRACTS.amoy.tier1Staking as Address;
+const tier2Addr = CONTRACTS.amoy.tier2Staking as Address;
+const tier3Addr = CONTRACTS.amoy.tier3Vault as Address;
+const marketAddr = CONTRACTS.amoy.marketplaceCore as Address;
 
 export function useContracts() {
-  const account = useActiveAccount();
-  const { mutate: sendTx } = useSendTransaction();
-  const { data: nativeBalance } = useWalletBalance({ address: account?.address, chain, client });
-  const addr = account?.address;
-  const { data: hNOBTBalance } = useReadContract({ contract: hNOBT(), method: "balanceOf", params: addr ? [addr] : ([] as any) });
-  const { data: brtBalance } = useReadContract({ contract: brt(), method: "balanceOf", params: addr ? [addr] : ([] as any) });
+  const { address, isConnected } = useAccount();
+  const { data: native } = useBalance({ address });
 
-  const stake = async (contract: ReturnType<typeof getContract>, amount: string) => {
-    const tx = await (prepareContractCall as any)({ contract: contract as any, method: "stake", params: [amount] });
-    await (sendTx as any)(tx);
-  };
+  const { data: hNOBTBalance } = useReadContract({ abi: ERC20_ABI, address: hNOBT, functionName: "balanceOf", args: address ? [address] : undefined, query: { enabled: !!address } });
+  const { data: brtBalance } = useReadContract({ abi: ERC20_ABI, address: brt, functionName: "balanceOf", args: address ? [address] : undefined, query: { enabled: !!address } });
 
-  const unstake = async (contract: ReturnType<typeof getContract>, amount: string) => {
-    const tx = await (prepareContractCall as any)({ contract: contract as any, method: "unstake", params: [amount] });
-    await (sendTx as any)(tx);
-  };
+  const { writeContractAsync } = useWriteContract();
+  const write = (payload: Parameters<typeof writeContractAsync>[0]) =>
+    writeContractAsync(payload as any);
 
-  const buyListing = async (listingId: number, value: string) => {
-    const tx = await (prepareContractCall as any)({ contract: marketplace() as any, method: "buy", params: [BigInt(listingId)], value: BigInt(value) });
-    await (sendTx as any)(tx);
-  };
+  const stake = (addr: Address, abi: typeof STAKING_ABI, amount: string) =>
+    write({ abi, address: addr, functionName: "stake", args: [amount] } as any);
+
+  const unstake = (addr: Address, abi: typeof STAKING_ABI, amount: string) =>
+    write({ abi, address: addr, functionName: "unstake", args: [amount] } as any);
 
   return {
-    address: account?.address,
-    isConnected: !!account,
-    nativeBalance: nativeBalance?.displayValue ?? "0",
+    address,
+    isConnected,
+    nativeBalance: native ? (Number(native.value) / 1e18).toFixed(4) : "0",
     hNOBTBalance: hNOBTBalance?.toString() ?? "0",
     brtBalance: brtBalance?.toString() ?? "0",
-    stakeTier1: (amt: string) => stake(tier1(), amt),
-    stakeTier2: (amt: string) => stake(tier2(), amt),
-    stakeTier3: (amt: string) => stake(tier3(), amt),
-    unstakeTier1: (amt: string) => unstake(tier1(), amt),
-    unstakeTier2: (amt: string) => unstake(tier2(), amt),
-    unstakeTier3: (amt: string) => unstake(tier3(), amt),
-    depositTier3: async (amt: string) => {
-      const tx = await (prepareContractCall as any)({ contract: tier3() as any, method: "deposit", params: [amt] });
-      await (sendTx as any)(tx);
-    },
-    buyListing,
+    stakeTier1: (amt: string) => stake(tier1Addr, STAKING_ABI, amt),
+    unstakeTier1: (amt: string) => unstake(tier1Addr, STAKING_ABI, amt),
+    stakeTier2: (amt: string) => stake(tier2Addr, STAKING_ABI, amt),
+    unstakeTier2: (amt: string) => unstake(tier2Addr, STAKING_ABI, amt),
+    depositTier3: (amt: string) =>
+      write({ abi: TIER3_ABI, address: tier3Addr, functionName: "deposit", args: [amt] } as any),
+    buyListing: (id: number, value: string) =>
+      write({ abi: MARKETPLACE_ABI, address: marketAddr, functionName: "buy", args: [BigInt(id)] } as any),
+    marketplaceReady: isReal(marketAddr),
+    marketAddr,
+    marketABI: MARKETPLACE_ABI,
   };
 }

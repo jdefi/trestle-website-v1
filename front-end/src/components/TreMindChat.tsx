@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from "react";
+import { useAccount } from "wagmi";
 import { treMindChat } from "../lib/treMind";
-import { useActiveAccount } from "thirdweb/react";
 
 export default function TreMindChat() {
-  const account = useActiveAccount();
-  const address = account?.address;
+  const { address } = useAccount();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: "user" | "treMind"; text: string }[]>([]);
   const [input, setInput] = useState("");

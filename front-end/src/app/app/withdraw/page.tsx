@@ -1,31 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { useActiveAccount } from "thirdweb/react";
+import { useAccount, useBalance } from "wagmi";
 import { useContracts } from "@/hooks/useContracts";
-import { client, chain } from "@/config/web3";
-import { prepareContractCall } from "thirdweb";
-import { useSendTransaction } from "thirdweb/react";
 
 export default function WithdrawPage() {
-  const account = useActiveAccount();
-  const isConnected = !!account;
-  const { nativeBalance, hNOBTBalance, brtBalance, unstakeTier1, unstakeTier2 } = useContracts();
-  const { mutate: sendTx } = useSendTransaction();
+  const { address, isConnected } = useAccount();
+  const { data: native } = useBalance({ address });
+  const { hNOBTBalance, brtBalance } = useContracts();
   const [busy, setBusy] = useState<string | null>(null);
+
+  const nativeBalance = native ? (Number(native.value) / 1e18).toFixed(4) : "0";
 
   const withdrawNative = async () => {
     setBusy("matic");
     try {
       const amount = prompt("Enter MATIC amount to withdraw (in wei):", "0");
       if (!amount) return;
-      const tx = await (prepareContractCall as any)({
-        contract: { address: account!.address, chain, client },
-        method: "0x",
-        params: [],
-        value: BigInt(amount),
-      });
-      await (sendTx as any)(tx);
+      alert("MATIC withdrawal via wallet interaction coming soon");
     } catch (e: any) { alert(e.message); }
     setBusy(null);
   };
@@ -38,7 +30,7 @@ export default function WithdrawPage() {
       ) : (
         <div className="space-y-3">
           <div className="bg-white rounded-xl border p-4 space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-gray-500">MATIC</span><span className="font-medium">{parseFloat(nativeBalance).toFixed(4)}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">MATIC</span><span className="font-medium">{nativeBalance}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">hNOBT</span><span className="font-medium">{(BigInt(hNOBTBalance || "0") / 10n ** 18n).toString()}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">BRT</span><span className="font-medium">{(BigInt(brtBalance || "0") / 10n ** 18n).toString()}</span></div>
           </div>

@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useActiveAccount } from "thirdweb/react";
+import { useAccount } from "wagmi";
 import { useContracts } from "@/hooks/useContracts";
 
 export default function Tier2Page() {
-  const account = useActiveAccount();
-  const isConnected = !!account;
+  const { isConnected } = useAccount();
   const { brtBalance, stakeTier2 } = useContracts();
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);

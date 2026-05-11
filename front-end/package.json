@@ -5,15 +5,17 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "vercel-build": "npm run build" 
+    "start": "next start"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.0.0",
+    "@tanstack/react-query": "^5.100.9",
+    "@web3modal/ui": "^5.1.11",
+    "@web3modal/wagmi": "^5.1.11",
     "next": "^16.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "thirdweb": "^5.88.0"
+    "viem": "^2.48.11",
+    "wagmi": "^3.6.12"
   },
   "devDependencies": {
     "@types/minimatch": "^6.0.0",

@@ -1,27 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useActiveAccount } from "thirdweb/react";
+import { useState } from "react";
+import { useAccount } from "wagmi";
+import { useReadContract } from "wagmi";
 import { useContracts } from "@/hooks/useContracts";
-import { getContract } from "thirdweb";
-import { useReadContract } from "thirdweb/react";
-import { client, chain } from "@/config/web3";
-import { CONTRACTS } from "@/config/contracts";
-import { treMindChat } from "@/lib/treMind";
-
-const MARKETPLACE_ABI = [
-  { inputs: [{ name: "listingId", type: "uint256" }], name: "getListing", outputs: [{ name: "seller", type: "address" }, { name: "price", type: "uint256" }, { name: "active", type: "bool" }], type: "function", stateMutability: "view" },
-  { inputs: [], name: "listingCount", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
-] as const;
 
 export default function MarketplacePage() {
-  const account = useActiveAccount();
-  const isConnected = !!account;
-  const { buyListing } = useContracts();
+  const { isConnected } = useAccount();
+  const { buyListing, marketplaceReady, marketAddr, marketABI } = useContracts();
   const [busy, setBusy] = useState<number | null>(null);
 
-  const mc = getContract({ client, chain, address: CONTRACTS.amoy.marketplaceCore, abi: MARKETPLACE_ABI });
-  const { data: count } = useReadContract({ contract: mc, method: "listingCount" });
+  const { data: count } = useReadContract({
+    abi: marketABI,
+    address: marketAddr,
+    functionName: "listingCount",
+    query: { enabled: marketplaceReady },
+  });
   const listingCount = Number(count || 0);
 
   const buy = async (id: number, price: string) => {
@@ -43,7 +37,7 @@ export default function MarketplacePage() {
       ) : (
         <div className="space-y-3">
           {Array.from({ length: listingCount }, (_, i) => i + 1).map((id) => (
-            <ListingCard key={id} id={id} onBuy={buy} busy={busy === id} />
+            <ListingCard key={id} id={id} addr={marketAddr} abi={marketABI} onBuy={buy} busy={busy === id} />
           ))}
         </div>
       )}
@@ -51,12 +45,18 @@ export default function MarketplacePage() {
   );
 }
 
-function ListingCard({ id, onBuy, busy }: { id: number; onBuy: (id: number, price: string) => void; busy: boolean }) {
-  const mc = getContract({ client, chain, address: CONTRACTS.amoy.marketplaceCore, abi: MARKETPLACE_ABI });
-  const { data } = useReadContract({ contract: mc, method: "getListing", params: [BigInt(id)] });
+function ListingCard({ id, addr, abi, onBuy, busy }: { id: number; addr: `0x${string}`; abi: readonly any[]; onBuy: (id: number, price: string) => void; busy: boolean }) {
+  const { data } = useReadContract({
+    abi,
+    address: addr,
+    functionName: "getListing",
+    args: [BigInt(id)],
+    query: { enabled: true },
+  });
 
-  if (!data || !(data as any)[2]) return null;
-  const [seller, price, active] = data as [string, bigint, boolean];
+  if (!data) return null;
+  const listing = data as [string, bigint, boolean];
+  const [seller, price, active] = listing;
   if (!active) return null;
 
   return (
@@ -64,9 +64,9 @@ function ListingCard({ id, onBuy, busy }: { id: number; onBuy: (id: number, pric
       <div>
         <p className="text-sm font-medium">Listing #{id}</p>
         <p className="text-xs text-gray-500">Seller: {seller.slice(0, 6)}...{seller.slice(-4)}</p>
-        <p className="text-sm font-semibold text-emerald-600 mt-1">{price.toString()} wei</p>
+        <p className="text-sm font-semibold text-emerald-600 mt-1">{Number(price) / 1e18} MATIC</p>
       </div>
-      <button onClick={() => onBuy(id, price.toString())} disabled={busy}
+      <button onClick={() => onBuy(id, (Number(price) / 1e18).toString())} disabled={busy}
         className="px-4 py-2 bg-emerald-500 text-white text-sm rounded-lg font-medium hover:bg-emerald-600 disabled:opacity-50">
         {busy ? "Buying..." : "Buy"}
       </button>

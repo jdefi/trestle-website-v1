@@ -38,7 +38,9 @@ const RPCS: Record<number, RpcConfig[]> = {
 };
 
 function buildBlockscoutRpc(chainId: number): RpcConfig {
-  return { url: `https://api.blockscout.com/${chainId}/json-rpc`, label: "Blockscout", weight: 3 };
+  const key = (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_BLOCKSCOUT_API_KEY || process.env.BLOCKSCOUT_API_KEY)) || "";
+  const qs = key ? `?apikey=${key}` : "";
+  return { url: `https://api.blockscout.com/${chainId}/json-rpc${qs}`, label: "Blockscout", weight: 3 };
 }
 
 function getRpcs(chainId: number): RpcConfig[] {
