@@ -36,36 +36,38 @@ const tokens = [
 
 export default function Tokens() {
   return (
-    <section id="tokens" className="py-24">
-      <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900">
+    <section id="tokens" className="py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-6">
+        <h2 className="mb-8 text-3xl md:text-4xl font-bold text-center text-gray-900">
           Three Tokens.{" "}
-          <span className="text-emerald-500">One Flywheel.</span>
+          <span className="text-emerald-600">One Flywheel.</span>
         </h2>
-        <p className="mt-4 text-gray-500 text-center max-w-2xl mx-auto">
+        <p className="mb-16 text-gray-500 text-center max-w-2xl mx-auto">
           A unique triple-token system designed to reward activity, stability, and ownership.
         </p>
 
-        <div className="mt-16 grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {tokens.map((t) => (
             <div
               key={t.name}
-              className={`p-6 rounded-2xl border bg-white hover:shadow-lg transition-all`}
+              className={`group p-8 bg-white rounded-2xl border border-gray-100 hover:shadow-xl hover:border-emerald-100 
+                        transition-all duration-300 transform hover:-translate-y-1`}
             >
               <span
-                className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
-                  t.color === "emerald"
-                    ? "bg-emerald-100 text-emerald-700"
-                    : t.color === "blue"
-                    ? "bg-blue-100 text-blue-700"
-                    : "bg-purple-100 text-purple-700"
-                }`}
+                className={`mb-4 inline-block px-3 py-1 text-xs font-semibold rounded-full 
+                        ${t.color === "emerald"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : t.color === "blue"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-purple-100 text-purple-700"} transition-transform duration-300 group-hover:scale-110`}
               >
                 {t.tier}
               </span>
-              <h3 className="mt-4 text-2xl font-bold text-gray-900">{t.name}</h3>
-              <p className="text-sm text-gray-500 font-medium">{t.role}</p>
-              <div className="mt-4 space-y-2 text-sm text-gray-600">
+              <h3 className="mb-4 text-2xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">
+                {t.name}
+              </h3>
+              <p className="mb-3 text-sm text-gray-500 font-medium">{t.role}</p>
+              <div className="space-y-2 text-sm text-gray-600">
                 <p><span className="font-medium text-gray-900">Supply:</span> {t.supply}</p>
                 <p><span className="font-medium text-gray-900">Distribution:</span> {t.distribution}</p>
                 <p><span className="font-medium text-gray-900">Utility:</span> {t.utility}</p>

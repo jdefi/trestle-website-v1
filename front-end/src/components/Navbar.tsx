@@ -15,13 +15,15 @@ export default function Navbar() {
             Trestle
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="/#features" className="text-sm text-gray-600 hover:text-emerald-600">Features</Link>
-            <Link href="/#tokens" className="text-sm text-gray-600 hover:text-emerald-600">Tokens</Link>
-            <Link href="/#roadmap" className="text-sm text-gray-600 hover:text-emerald-600">Roadmap</Link>
-            <Link href="/app" className="text-sm text-gray-600 hover:text-emerald-600">App</Link>
-            <a href="https://docs.trestleprotocol.io" className="text-sm text-gray-600 hover:text-emerald-600">Docs</a>
-          </div>
+           <div className="hidden md:flex items-center gap-8">
+             <Link href="/#features" className="text-sm text-gray-600 hover:text-emerald-600">Features</Link>
+             <Link href="/#tokens" className="text-sm text-gray-600 hover:text-emerald-600">Tokens</Link>
+             <Link href="/#roadmap" className="text-sm text-gray-600 hover:text-emerald-600">Roadmap</Link>
+             <Link href="/app" className="text-sm text-gray-600 hover:text-emerald-600">App</Link>
+             <a href="https://docs.trestleprotocol.io" className="text-sm text-gray-600 hover:text-emerald-600">Docs</a>
+             <a href="https://reward.trestle.website" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-emerald-600">Reward Hub</a>
+             <a href="https://testnet.trestle.website" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-emerald-600">Testnet Hub</a>
+           </div>
 
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-3">
@@ -46,24 +48,26 @@ export default function Navbar() {
           </div>
         </div>
 
-        {mobileOpen && (
-          <div className="md:hidden border-t border-gray-100 py-4 space-y-3">
-            <Link href="/#features" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-emerald-600">Features</Link>
-            <Link href="/#tokens" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-emerald-600">Tokens</Link>
-            <Link href="/#roadmap" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-emerald-600">Roadmap</Link>
-            <Link href="/app" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-emerald-600">App</Link>
-            <a href="https://docs.trestleprotocol.io" target="_blank" rel="noopener noreferrer" className="block text-sm text-gray-600 hover:text-emerald-600">Docs</a>
-            <hr className="border-gray-100" />
-            <W3mButton />
-            <a
-              href="https://t.me/trestle_bot/app"
-              target="_blank"
-              className="inline-block px-4 py-2 border border-emerald-500 text-emerald-600 text-sm font-medium rounded-xl hover:bg-emerald-50 transition-colors"
-            >
-              Telegram App
-            </a>
-          </div>
-        )}
+         {mobileOpen && (
+           <div className="md:hidden border-t border-gray-100 py-4 space-y-3">
+             <Link href="/#features" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-emerald-600">Features</Link>
+             <Link href="/#tokens" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-emerald-600">Tokens</Link>
+             <Link href="/#roadmap" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-emerald-600">Roadmap</Link>
+             <Link href="/app" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-emerald-600">App</Link>
+             <a href="https://docs.trestleprotocol.io" target="_blank" rel="noopener noreferrer" className="block text-sm text-gray-600 hover:text-emerald-600">Docs</a>
+             <a href="https://reward.trestle.website" target="_blank" rel="noopener noreferrer" className="block text-sm text-gray-600 hover:text-emerald-600">Reward Hub</a>
+             <a href="https://testnet.trestle.website" target="_blank" rel="noopener noreferrer" className="block text-sm text-gray-600 hover:text-emerald-600">Testnet Hub</a>
+             <hr className="border-gray-100" />
+             <W3mButton />
+             <a
+               href="https://t.me/trestle_bot/app"
+               target="_blank"
+               className="inline-block px-4 py-2 border border-emerald-500 text-emerald-600 text-sm font-medium rounded-xl hover:bg-emerald-50 transition-colors"
+             >
+               Telegram App
+             </a>
+           </div>
+         )}
       </div>
     </nav>
   );
