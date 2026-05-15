@@ -54,7 +54,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <W3mButton />
             <a
-              href="https://t.m/TrestlePro"
+              href="https://t.me/TrestlePro"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
@@ -104,7 +104,7 @@ export default function Navbar() {
               )
             )}
             <a
-              href="https://t.m/TrestlePro"
+              href="https://t.me/TrestlePro"
               target="_blank"
               rel="noopener noreferrer"
               className="block py-2 text-sm text-gray-600 hover:text-emerald-600 transition-colors"

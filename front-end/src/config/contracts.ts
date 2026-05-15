@@ -16,7 +16,7 @@ export const CONTRACTS = {
 };
 
 export const LINKS = {
-  telegram: "https://t.m/TrestlePro",
+  telegram: "https://t.me/TrestlePro",
   discord: "https://discord.gg/4dCCvnJYGT",
   github: "https://github.com/Trestle-Protocol",
   docs: "https://docs.trestleprotocol.io",

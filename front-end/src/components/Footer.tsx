@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { LINKS } from "@/config/contracts";
-import QRCode from "@/components/QRCode";
 import Icon from "./Icon";
 
 export default function Footer() {
@@ -41,9 +40,6 @@ export default function Footer() {
             <a href={LINKS.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">Telegram</a>
             <a href="mailto:contact@trestle.website" className="hover:text-emerald-400 transition-colors">contact@trestle.website</a>
             <a href="https://github.com/Trestle-Protocol" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">GitHub</a>
-          </div>
-          <div className="mt-3">
-            <QRCode value="https://trestle.website" size={140} />
           </div>
         </div>
         <div>

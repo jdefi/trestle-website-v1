@@ -87,6 +87,6 @@ npm start
 - **Website**: [https://trestle.website](https://trestle.website)
 - **GitHub**: [Trestle Protocol](https://github.com/Trestle-Protocol)
 - **Discord**: [Trestle Protocol](https://discord.gg/4dCCvnJYGT)
-- **Telegram**: [Trestle Pro](https://t.m/TrestlePro)
+- **Telegram**: [Trestle Pro](https://t.me/TrestlePro)
 - **Email**: contact@trestle.website
 
