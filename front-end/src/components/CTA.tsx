@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { LINKS } from "@/config/contracts";
+import QRCode from "@/components/QRCode";
 
 export default function CTA() {
   return (
@@ -13,8 +15,8 @@ export default function CTA() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
           <Link
             href="/app"
-            className="flex-1 sm:flex-none px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl 
-                      transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl 
+            className="flex-1 sm:flex-none px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl
+                      transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl
                       border border-emerald-600 hover:border-transparent"
           >
             Launch dApp
@@ -24,8 +26,8 @@ export default function CTA() {
               href="https://reward.trestle.website"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-8 py-4 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-xl 
-                        hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-300 transform hover:-translate-y-1 
+              className="flex-1 px-8 py-4 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-xl
+                        hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-300 transform hover:-translate-y-1
                         shadow-sm hover:shadow"
             >
               Reward Hub
@@ -34,24 +36,33 @@ export default function CTA() {
               href="https://testnet.trestle.website"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-8 py-4 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-xl 
-                        hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-300 transform hover:-translate-y-1 
+              className="flex-1 px-8 py-4 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-xl
+                        hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-300 transform hover:-translate-y-1
                         shadow-sm hover:shadow"
             >
               Testnet Hub
             </a>
           </div>
           <a
-            href="https://t.me/trestle_bot/app"
+            href={LINKS.telegram}
             target="_blank"
-            className="flex-1 sm:flex-none px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl 
-                      transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl 
+            rel="noopener noreferrer"
+            className="flex-1 sm:flex-none px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl
+                      transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl
                       border border-emerald-600 hover:border-transparent"
           >
-            Telegram Mini-App
+            💬 Telegram
           </a>
         </div>
+        <div className="mt-12 flex justify-center">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 inline-block">
+            <QRCode value={SITE_URL} size={140} bgColor="ffffff" fgColor="059669" />
+          </div>
+        </div>
+        <p className="mt-4 text-sm text-gray-400">Scan the QR code to open on mobile</p>
       </div>
     </section>
   );
 }
+
+const SITE_URL = "https://trestle.website";

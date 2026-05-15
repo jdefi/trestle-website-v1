@@ -18,7 +18,7 @@ export default function Hero() {
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-700">
             Economic Bridge
           </span>{" "}
-          Between Digital Labor & Real-World Assets
+          Between Digital Labor &amp; Real-World Assets
         </h1>
 
         <p className="mt-4 text-base md:text-lg text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed">
@@ -29,32 +29,39 @@ export default function Hero() {
         <div className="mt-8 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
           <Link
             href="/app"
-            className="flex-1 sm:flex-none px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl 
-                      transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl 
+            className="flex-1 sm:flex-none px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl
+                      transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl
                       border border-emerald-600 hover:border-transparent"
           >
             Launch dApp
           </Link>
           <a
-            href="https://t.me/trestle_bot/app"
+            href="https://t.m/TrestlePro"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 sm:flex-none px-6 py-3 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-xl 
-                      hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-300 transform hover:-translate-y-1 
+            className="flex-1 sm:flex-none px-6 py-3 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-xl
+                      hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-300 transform hover:-translate-y-1
                       shadow-sm hover:shadow"
           >
-            Open Telegram Mini-App
+            💬 Open Telegram
           </a>
           <Link
             href="#features"
-            className="flex-1 sm:flex-none px-6 py-3 text-gray-600 font-semibold rounded-xl hover:text-gray-800 
+            className="flex-1 sm:flex-none px-6 py-3 text-gray-600 font-semibold rounded-xl hover:text-gray-800
                       transition-all duration-200 hover:bg-gray-50"
           >
             Learn More &rarr;
           </Link>
         </div>
 
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-3 gap-5 max-w-3xl mx-auto">
+        {/* QR Code below hero on desktop */}
+        <div className="hidden md:block mt-10">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 p-4 inline-block">
+            <QRCode value="https://trestle.website" size={150} />
+          </div>
+        </div>
+
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-5 max-w-3xl mx-auto">
           {[
             ["$2.5M+", "Trading Volume"],
             ["50K+", "Community Members"],
