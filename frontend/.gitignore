@@ -1,0 +1,8 @@
+# Next.js
+node_modules/
+.env
+.env.local
+.next/
+out/
+*.log
+.DS_Store

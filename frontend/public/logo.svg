@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="t1" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#6ee7b7"/>
+    </linearGradient>
+    <linearGradient id="t2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a7f3d0"/>
+      <stop offset="100%" stop-color="#6ee7b7"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="128" cy="128" r="124" fill="url(#bg)"/>
+  <!-- Abstract "T" letter made of stacked bars -->
+  <!-- Bottom bar (widest) -->
+  <rect x="48" y="168" width="160" height="28" rx="6" fill="white" opacity="0.95"/>
+  <!-- Middle bar -->
+  <rect x="72" y="120" width="112" height="24" rx="5" fill="white" opacity="0.85"/>
+  <!-- Top bar (narrowest) -->
+  <rect x="96" y="72" width="64" height="20" rx="4" fill="white" opacity="0.95"/>
+  <!-- Glow dots -->
+  <circle cx="64" cy="200" r="6" fill="#34d399" opacity="0.6"/>
+  <circle cx="192" cy="80" r="4" fill="#a7f3d0" opacity="0.5"/>
+  <circle cx="128" cy="140" r="3" fill="#6ee7b7" opacity="0.7"/>
+</svg>
