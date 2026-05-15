@@ -1,11 +1,13 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
 import { useAccount } from "wagmi";
-import { treMindChat } from "../lib/treMind";
+import { astraChat } from "../lib/astra";
 
-export default function TreMindChat() {
+export default function AstraChat() {
   const { address } = useAccount();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<{ role: "user" | "treMind"; text: string }[]>([]);
+  const [messages, setMessages] = useState<{ role: "user" | "astra"; text: string }[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const bottom = useRef<HTMLDivElement>(null);
@@ -19,20 +21,20 @@ export default function TreMindChat() {
     setMessages(prev => [...prev, { role: "user", text: msg }]);
     setBusy(true);
     try {
-      const response = await treMindChat(msg, address ? { address: address.slice(0, 8) } : {});
-      setMessages(prev => [...prev, { role: "treMind", text: response }]);
+      const response = await astraChat(msg, address ? { address: address.slice(0, 8) } : {});
+      setMessages(prev => [...prev, { role: "astra", text: response }]);
     } catch {
-      setMessages(prev => [...prev, { role: "treMind", text: "TreMind is offline. Check TREMIND_API_URL." }]);
+      setMessages(prev => [...prev, { role: "astra", text: "Astra is offline. Check ASTRA_API_URL." }]);
     }
     setBusy(false);
   };
 
   if (!open) {
     return (
-      <button 
+      <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-emerald-600 text-white text-2xl 
-                  shadow-2xl hover:bg-emerald-700 transition-all duration-300 transform hover:scale-105 
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-emerald-600 text-white text-2xl
+                  shadow-2xl hover:bg-emerald-700 transition-all duration-300 transform hover:scale-105
                   flex items-center justify-center"
       >
         <span className="animate-pulse">🧠</span>
@@ -41,18 +43,18 @@ export default function TreMindChat() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col" 
+    <div className="fixed bottom-6 right-6 z-50 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col"
          style={{ maxHeight: "80vh" }}>
       <div className="flex items-center justify-between px-5 py-4 bg-emerald-600 text-white">
         <div className="flex items-center gap-3">
           <span className="text-xl">🧠</span>
           <div>
-            <span className="font-semibold text-sm">TreMind AI</span>
+            <span className="font-semibold text-sm">Astra AI</span>
             <p className="text-xs text-white/80">Your Web3 Assistant</p>
           </div>
         </div>
-        <button 
-          onClick={() => setOpen(false)} 
+        <button
+          onClick={() => setOpen(false)}
           className="text-white/90 hover:text-white text-xl leading-none transition-colors duration-200"
         >
           ×
@@ -62,10 +64,10 @@ export default function TreMindChat() {
         {messages.length === 0 && (
           <div className="text-center py-12">
             <p className="text-sm text-gray-500 mb-2">
-              Ask TreMind about Trestle Protocol, staking, rewards, or disputes.
+              Ask Astra about Trestle Protocol, staking, rewards, or disputes.
             </p>
             <div className="flex flex-wrap justify-center gap-2">
-              <button 
+              <button
                 onClick={() => {
                   setInput("How do I connect my wallet?");
                   send();
@@ -74,7 +76,7 @@ export default function TreMindChat() {
               >
                 Wallet Help
               </button>
-              <button 
+              <button
                 onClick={() => {
                   setInput("What is hNOBT?");
                   send();
@@ -83,7 +85,7 @@ export default function TreMindChat() {
               >
                 hNOBT Info
               </button>
-              <button 
+              <button
                 onClick={() => {
                   setInput("How does staking work?");
                   send();
@@ -97,9 +99,9 @@ export default function TreMindChat() {
         )}
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow 
-                      ${m.role === "user" 
-                        ? "bg-emerald-600 text-white" 
+            <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow
+                      ${m.role === "user"
+                        ? "bg-emerald-600 text-white"
                         : "bg-gray-50 text-gray-800 border border-gray-200"}`}
             >
               {m.text}
@@ -110,27 +112,27 @@ export default function TreMindChat() {
           <div className="flex items-center justify-center py-4">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
-              <span className="text-xs text-emerald-600 font-medium">TreMind is thinking...</span>
+              <span className="text-xs text-emerald-600 font-medium">Astra is thinking...</span>
             </div>
           </div>
         )}
         <div ref={bottom} />
       </div>
       <div className="border-t px-4 py-3 flex gap-3">
-        <input 
-          value={input} 
+        <input
+          value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && send()}
-          placeholder="Ask TreMind..." 
-          className="flex-1 min-h-[44px] border border-gray-300 rounded-lg px-4 py-2 text-sm 
-                    focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 
+          placeholder="Ask Astra..."
+          className="flex-1 min-h-[44px] border border-gray-300 rounded-lg px-4 py-2 text-sm
+                    focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200
                     transition-all duration-200"
         />
-        <button 
-          onClick={send} 
+        <button
+          onClick={send}
           disabled={busy || !input.trim()}
-          className="flex-shrink-0 px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium 
-                    hover:bg-emerald-700 transition-all duration-200 transform hover:scale-105 
+          className="flex-shrink-0 px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium
+                    hover:bg-emerald-700 transition-all duration-200 transform hover:scale-105
                     disabled:opacity-50 disabled:cursor-not-allowed shadow hover:shadow-md"
         >
           Send

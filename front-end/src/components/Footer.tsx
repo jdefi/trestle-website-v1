@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LINKS } from "@/config/contracts";
 import QRCode from "@/components/QRCode";
-import { Icon } from "./Icon";
+import Icon from "./Icon";
 
 export default function Footer() {
   return (

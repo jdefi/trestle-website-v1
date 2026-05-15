@@ -3,7 +3,7 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-// import TreMindChat from "@/components/TreMindChatWrapper";
+import AstraChat from "@/components/AstraChatWrapper";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           <main>{children}</main>
           <Footer />
-          {/* <TreMindChat /> */}
+          {/* <AstraChat /> */}
         </Providers>
       </body>
     </html>

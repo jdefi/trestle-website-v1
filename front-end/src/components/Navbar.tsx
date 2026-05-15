@@ -1,7 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { useState } from "react";
 import W3mButton from "./W3mButton";
-import { Icon } from "./Icon";
+import Icon from "./Icon";
 
 const NAV_LINKS = [
   { href: "/#features", label: "Features" },

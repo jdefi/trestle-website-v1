@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useAccount, useSignMessage } from "wagmi";
 import { encodeFunctionData } from "viem";
+import { API_BASE } from "@/config/contracts";
 
 interface GaslessClaimProps {
   onSuccess?: (txHash: string) => void;
@@ -90,16 +91,16 @@ export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) 
     }
   }, [address, connector, signMessageAsync, onSuccess, onError]);
 
-  /**
-   * Handle claim via self-hosted relayer
-   */
-  async function handleSelfHostedClaim(
-    user: string,
-    amount: bigint,
-    claimId: string,
-    signature: string
-  ) {
-    const response = await fetch("/api/gasless-claim", {
+/**
+    * Handle claim via self-hosted relayer
+    */
+   async function handleSelfHostedClaim(
+     user: string,
+     amount: bigint,
+     claimId: string,
+     signature: string
+   ) {
+     const response = await fetch(`${API_BASE}/api/gasless-claim`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -115,10 +116,10 @@ export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) 
       throw new Error(data.error || "Claim failed");
     }
 
-    const data = await response.json();
-    setTxHash(data.txHash);
-    onSuccess?.(data.txHash);
-  }
+const data = await response.json();
+     setTxHash(data.txHash);
+     onSuccess?.(data.txHash);
+   }
 
   /**
    * Handle claim via Biconomy
