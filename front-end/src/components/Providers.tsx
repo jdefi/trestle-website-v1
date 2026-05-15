@@ -19,12 +19,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           "--w3m-color-mix": "#059669",
           "--w3m-color-mix-strength": 20,
         },
-        walletFeatures: {
-          onramp: false,
-          swap: false,
-          send: false,
-          receive: false,
-        },
       });
       initialized.current = true;
     }

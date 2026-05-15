@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function Hero() {
   return (
@@ -57,7 +58,7 @@ export default function Hero() {
         {/* QR Code below hero on desktop */}
         <div className="hidden md:block mt-10">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 p-4 inline-block">
-            <QRCode value="https://trestle.website" size={150} />
+            <QRCodeSVG value="https://trestle.website" size={150} />
           </div>
         </div>
 

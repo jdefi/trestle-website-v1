@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useSignMessage, useWalletClient } from "wagmi";
+import type { WalletClient } from "viem";
 import { API_BASE } from "@/config/contracts";
+import { polygon } from "viem/chains";
+import { http } from "viem";
+import { createSmartAccountClient } from "@biconomy/sdk";
 
 interface GaslessClaimProps {
   onSuccess?: (txHash: string) => void;
@@ -11,6 +15,7 @@ interface GaslessClaimProps {
 
 export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) {
   const { address } = useAccount();
+  const { data: walletClient } = useWalletClient();
   const [loading, setLoading] = useState(false);
   const [txHash, setTxHash] = useState("");
   const [error, setError] = useState("");
@@ -71,7 +76,7 @@ export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) 
         message: JSON.stringify(JSON.parse(message)),
       });
 
-      // Use self-hosted relayer (backend submits on-chain)
+      // Submit via self-hosted relayer (backend broadcasts on-chain)
       await handleSelfHostedClaim(address, amount, claimId, signature);
     } catch (err: any) {
       const errorMessage = err.message || "Transaction failed";
@@ -82,35 +87,79 @@ export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) 
     }
   }, [address, signMessageAsync, onSuccess, onError]);
 
-/**
- * Handle claim via self-hosted relayer
- */
-   async function handleSelfHostedClaim(
-     user: string,
-     amount: bigint,
-     claimId: string,
-     signature: string
-   ) {
-     const response = await fetch(`${API_BASE}/api/gasless-claim`, {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({
-         user,
-         amount: amount.toString(),
-         claimId,
-         signature,
-       }),
-     });
+  /**
+   * Handle claim via self-hosted relayer
+   */
+  async function handleSelfHostedClaim(
+    user: string,
+    amount: bigint,
+    claimId: string,
+    signature: string
+  ) {
+    const response = await fetch(`${API_BASE}/api/gasless-claim`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user,
+        amount: amount.toString(),
+        claimId,
+        signature,
+      }),
+    });
 
-     if (!response.ok) {
-       const data = await response.json();
-       throw new Error(data.error || "Claim failed");
-     }
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || "Claim failed");
+    }
 
-     const data = await response.json();
-     setTxHash(data.txHash);
-     onSuccess?.(data.txHash);
-   }
+    const data = await response.json();
+    setTxHash(data.txHash);
+    onSuccess?.(data.txHash);
+  }
+
+  /**
+   * Handle claim via Biconomy (gasless via Nexus smart account)
+   */
+  async function handleBiconomyClaim(
+    user: string,
+    amount: bigint,
+    claimId: string,
+    signature: string,
+    contractAddress: string
+  ) {
+    if (!walletClient) throw new Error("Wallet client not available");
+
+    const { encodeFunctionData } = await import("viem");
+
+    // biconomy's signer type does not match wagmi's typed WalletClient directly;
+    // narrow to `any` before passing so assignability succeeds.
+    const anySigner = walletClient as unknown as Parameters<typeof createSmartAccountClient>[0]["signer"];
+
+    const smartAccount = await createSmartAccountClient({
+      signer: anySigner,
+      chain: polygon,
+      transport: http("https://polygon.llamarpc.com"),
+      bundlerTransport: http("https://bundler.biconomy.io/api/v1/polygon/rpc"),
+      paymaster: true,
+    });
+
+    const encodedData = encodeFunctionData({
+      abi: [
+        "function claimOnBehalf(address user, uint256 amount, bytes32 claimId, bytes signature) external",
+      ],
+      functionName: "claimOnBehalf",
+      args: [user as `0x${string}`, amount, claimId, signature as `0x${string}`],
+    });
+
+    const txHash = await smartAccount.sendTransaction({
+      chain: polygon,
+      to: contractAddress as `0x${string}`,
+      data: encodedData,
+    });
+
+    setTxHash(txHash);
+    onSuccess?.(txHash);
+  }
 
   return (
     <div className="gasless-claim-container">

@@ -1,4 +1,6 @@
-export default function Icon({ name, size = 24, className = "" }) {
+type IconName = "logo" | "spinner" | "discord" | "telegram" | "github" | "globe" | "email" | "x";
+
+export default function Icon({ name, size = 24, className = "" }: { name: IconName; size?: number; className?: string }) {
   const icons = {
     logo: (
       <svg viewBox="0 0 256 256" fill="none" className={className} style={{ width: size, height: size }}>
