@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { useAccount, useSignMessage } from "wagmi";
-import { encodeFunctionData } from "viem";
 import { API_BASE } from "@/config/contracts";
 
 interface GaslessClaimProps {
@@ -11,7 +10,7 @@ interface GaslessClaimProps {
 }
 
 export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) {
-  const { address, connector } = useAccount();
+  const { address } = useAccount();
   const [loading, setLoading] = useState(false);
   const [txHash, setTxHash] = useState("");
   const [error, setError] = useState("");
@@ -23,7 +22,7 @@ export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) 
    * The backend/relayer will submit this on-chain
    */
   const handleGaslessClaim = useCallback(async () => {
-    if (!address || !connector) {
+    if (!address) {
       setError("Please connect your wallet first");
       return;
     }
@@ -33,9 +32,6 @@ export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) 
     setTxHash("");
 
     try {
-      const RELAYER_MODE = process.env.NEXT_PUBLIC_RELAYER_MODE || "self-hosted";
-      const DISTRIBUTOR_ADDRESS = process.env.NEXT_PUBLIC_DISTRIBUTOR_ADDRESS!;
-
       // 1. User signs a message (FREE - no gas!)
       const claimId = crypto.randomUUID();
       const amount = BigInt(1000000000000000000); // 1 token in wei
@@ -60,7 +56,7 @@ export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) 
           name: "RewardDistributor",
           version: "1",
           chainId,
-          verifyingContract: DISTRIBUTOR_ADDRESS,
+          verifyingContract: process.env.NEXT_PUBLIC_DISTRIBUTOR_ADDRESS!,
         },
         message: {
           user: address,
@@ -75,13 +71,8 @@ export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) 
         message: JSON.stringify(JSON.parse(message)),
       });
 
-      if (RELAYER_MODE === "biconomy") {
-        // Option A: Use Biconomy for gasless transactions
-        await handleBiconomyClaim(address, amount, claimId, signature, DISTRIBUTOR_ADDRESS);
-      } else {
-        // Option B: Use self-hosted relayer (your backend)
-        await handleSelfHostedClaim(address, amount, claimId, signature);
-      }
+      // Use self-hosted relayer (backend submits on-chain)
+      await handleSelfHostedClaim(address, amount, claimId, signature);
     } catch (err: any) {
       const errorMessage = err.message || "Transaction failed";
       setError(errorMessage);
@@ -89,11 +80,11 @@ export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) 
     } finally {
       setLoading(false);
     }
-  }, [address, connector, signMessageAsync, onSuccess, onError]);
+  }, [address, signMessageAsync, onSuccess, onError]);
 
 /**
-    * Handle claim via self-hosted relayer
-    */
+ * Handle claim via self-hosted relayer
+ */
    async function handleSelfHostedClaim(
      user: string,
      amount: bigint,
@@ -101,72 +92,25 @@ export default function GaslessClaim({ onSuccess, onError }: GaslessClaimProps) 
      signature: string
    ) {
      const response = await fetch(`${API_BASE}/api/gasless-claim`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user,
-        amount: amount.toString(),
-        claimId,
-        signature,
-      }),
-    });
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({
+         user,
+         amount: amount.toString(),
+         claimId,
+         signature,
+       }),
+     });
 
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || "Claim failed");
-    }
+     if (!response.ok) {
+       const data = await response.json();
+       throw new Error(data.error || "Claim failed");
+     }
 
-const data = await response.json();
+     const data = await response.json();
      setTxHash(data.txHash);
      onSuccess?.(data.txHash);
    }
-
-  /**
-   * Handle claim via Biconomy
-   */
-  async function handleBiconomyClaim(
-    user: string,
-    amount: bigint,
-    claimId: string,
-    signature: string,
-    contractAddress: string
-  ) {
-    // Initialize Biconomy
-    const provider = await connector?.getProvider();
-    const signer = await connector?.getSigner();
-
-    const { createSmartAccountClient, ENTRYPOINT_ADDRESS_V07 } = await import(
-      "@biconomy/sdk"
-    );
-
-    const biconomyPaymasterUrl = `https://paymaster.biconomy.io/api/v1/paymaster/${process.env.NEXT_PUBLIC_BICONOMY_API_KEY}`;
-
-    const smartAccount = await createSmartAccountClient({
-      signer,
-      paymasterUrl: biconomyPaymasterUrl,
-      entryPointAddress: ENTRYPOINT_ADDRESS_V07,
-      bundlerUrl: "https://bundler.biconomy.io/api/v1/polygon/rpc",
-    });
-
-    // Encode the function call
-    const encodedData = encodeFunctionData({
-      abi: [
-        "function claimOnBehalf(address user, uint256 amount, bytes32 claimId, bytes signature) external",
-      ],
-      functionName: "claimOnBehalf",
-      args: [user, amount, claimId, signature as `0x${string}`],
-    });
-
-    // Execute gasless transaction
-    const tx = await smartAccount.sendTransaction({
-      to: contractAddress as `0x${string}`,
-      data: encodedData as `0x${string}`,
-    });
-
-    const receipt = await tx.wait();
-    setTxHash(receipt.transactionHash);
-    onSuccess?.(receipt.transactionHash);
-  }
 
   return (
     <div className="gasless-claim-container">
