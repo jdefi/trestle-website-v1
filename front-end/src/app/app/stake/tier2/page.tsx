@@ -24,7 +24,7 @@ export default function Tier2Page() {
       <p className="text-sm text-gray-500">Stake BroilerPlus LP tokens to earn mining rewards.</p>
       <div className="bg-white rounded-xl border p-4 text-sm">
         <span className="text-gray-500">Your BRT: </span>
-        <span className="font-medium">{(BigInt(brtBalance || "0") / 10n ** 18n).toString()} BRT</span>
+        <span className="font-medium">{(BigInt(brtBalance || "0") / 10n ** 9n).toString()} BRT</span>
       </div>
       {!isConnected ? (
         <p className="text-gray-400 text-sm">Connect wallet to stake.</p>

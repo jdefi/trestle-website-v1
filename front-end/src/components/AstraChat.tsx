@@ -64,7 +64,7 @@ export default function AstraChat() {
         {messages.length === 0 && (
           <div className="text-center py-12">
             <p className="text-sm text-gray-500 mb-2">
-              Ask Astra about Trestle Protocol, staking, rewards, or disputes.
+              Ask Astra about Trestle DeFi, staking, rewards, or disputes.
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               <button

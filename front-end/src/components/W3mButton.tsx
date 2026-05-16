@@ -14,7 +14,7 @@ export default function W3mButton() {
     if (!address) return;
     try {
       await signMessageAsync({
-        message: `Welcome to Trestle Protocol! By signing this message, you confirm your identity and agree to our Terms of Service. Nonce: ${Date.now()}`,
+        message: `Welcome to Trestle DeFi! By signing this message, you confirm your identity and agree to our Terms of Service. Nonce: ${Date.now()}`,
       });
     } catch {
       // Silently ignore — user may reject

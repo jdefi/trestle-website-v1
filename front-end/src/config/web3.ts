@@ -1,5 +1,6 @@
 import { http, createConfig } from "wagmi";
-import { polygon, polygonAmoy } from "wagmi/chains";
+import { fallback } from "viem";
+import { polygon } from "wagmi/chains";
 import { walletConnect, injected } from "wagmi/connectors";
 import { authConnector } from "@web3modal/wagmi";
 
@@ -18,8 +19,17 @@ export const biconomyPaymaster = biconomyConfig.apiKey
   ? `https://paymaster.biconomy.io/api/v1/paymaster/${biconomyConfig.apiKey}`
   : "";
 
+// Polygon mainnet RPC providers with fallback for load balancing
+const polygonTransports = [
+  http("https://polygon-rpc.com", { retryCount: 2, retryDelay: 500 }),
+  http("https://polygon.llamarpc.com", { retryCount: 2, retryDelay: 500 }),
+  http("https://rpc.ankr.com/polygon", { retryCount: 2, retryDelay: 500 }),
+  http("https://polygon.drpc.org", { retryCount: 2, retryDelay: 500 }),
+  process.env.NEXT_PUBLIC_BLOCKSCOUT_API ? http(process.env.NEXT_PUBLIC_BLOCKSCOUT_API, { retryCount: 2, retryDelay: 500 }) : null,
+].filter(Boolean) as ReturnType<typeof http>[];
+
 export const config = createConfig({
-  chains: [polygon, polygonAmoy],
+  chains: [polygon],
   connectors: [
     walletConnect({ projectId, showQrModal: false }),
     injected(),
@@ -32,13 +42,6 @@ export const config = createConfig({
     }),
   ],
   transports: {
-    [polygonAmoy.id]: http("https://rpc-amoy.polygon.technology", {
-      retryCount: 3,
-      retryDelay: 1000,
-    }),
-    [polygon.id]: http("https://polygon.llamarpc.com", {
-      retryCount: 3,
-      retryDelay: 1000,
-    }),
+    [polygon.id]: fallback(polygonTransports, { rank: true }),
   },
 });

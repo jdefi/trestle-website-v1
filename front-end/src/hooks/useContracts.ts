@@ -1,6 +1,7 @@
 "use client";
 
 import { useAccount, useBalance, useReadContract, useWriteContract } from "wagmi";
+import { polygon } from "wagmi/chains";
 import { type Address } from "viem";
 import { CONTRACTS } from "@/config/contracts";
 
@@ -33,19 +34,42 @@ const MARKETPLACE_ABI = [
 const PLACEHOLDER = "0x...";
 const isReal = (a: string) => a !== PLACEHOLDER && !a.startsWith("0x0000");
 
-const hNOBT = CONTRACTS.amoy.hNOBT as Address;
-const brt = CONTRACTS.amoy.broilerPlus as Address;
-const tier1Addr = CONTRACTS.amoy.tier1Staking as Address;
-const tier2Addr = CONTRACTS.amoy.tier2Staking as Address;
-const tier3Addr = CONTRACTS.amoy.tier3Vault as Address;
-const marketAddr = CONTRACTS.amoy.marketplaceCore as Address;
+const getContractAddresses = () => {
+  return {
+    hNOBT: CONTRACTS.polygon.hNOBT as Address,
+    brt: CONTRACTS.polygon.broilerPlus as Address,
+    tier1Addr: CONTRACTS.polygon.tier1Staking as Address,
+    tier2Addr: CONTRACTS.polygon.tier2Staking as Address,
+    tier3Addr: CONTRACTS.polygon.tier3Vault as Address,
+    marketAddr: CONTRACTS.polygon.marketplaceCore as Address,
+  };
+};
 
 export function useContracts() {
   const { address, isConnected } = useAccount();
-  const { data: native } = useBalance({ address });
+  const { data: native } = useBalance({ address, chainId: polygon.id });
+  const contracts = getContractAddresses();
 
-  const { data: hNOBTBalance } = useReadContract({ abi: ERC20_ABI, address: hNOBT, functionName: "balanceOf", args: address ? [address] : undefined, query: { enabled: !!address } });
-  const { data: brtBalance } = useReadContract({ abi: ERC20_ABI, address: brt, functionName: "balanceOf", args: address ? [address] : undefined, query: { enabled: !!address } });
+  // Query tokens on the wallet's connected chain
+  const { data: hNOBTBalance, error: hNOBTErr } = useReadContract({ 
+    abi: ERC20_ABI, 
+    address: contracts.hNOBT, 
+    functionName: "balanceOf", 
+    args: address ? [address] : undefined, 
+    chainId: polygon.id, 
+    query: { enabled: !!address && isReal(contracts.hNOBT) } 
+  });
+  const { data: brtBalance, error: brtErr } = useReadContract({ 
+    abi: ERC20_ABI, 
+    address: contracts.brt, 
+    functionName: "balanceOf", 
+    args: address ? [address] : undefined, 
+    chainId: polygon.id, 
+    query: { enabled: !!address && isReal(contracts.brt) } 
+  });
+
+  if (hNOBTErr) console.error("hNOBT balance error:", hNOBTErr);
+  if (brtErr) console.error("BRT balance error:", brtErr);
 
   const { writeContractAsync } = useWriteContract();
   const write = (payload: Parameters<typeof writeContractAsync>[0]) =>
@@ -63,16 +87,16 @@ export function useContracts() {
     nativeBalance: native ? (Number(native.value) / 1e18).toFixed(4) : "0",
     hNOBTBalance: hNOBTBalance?.toString() ?? "0",
     brtBalance: brtBalance?.toString() ?? "0",
-    stakeTier1: (amt: string) => stake(tier1Addr, STAKING_ABI, amt),
-    unstakeTier1: (amt: string) => unstake(tier1Addr, STAKING_ABI, amt),
-    stakeTier2: (amt: string) => stake(tier2Addr, STAKING_ABI, amt),
-    unstakeTier2: (amt: string) => unstake(tier2Addr, STAKING_ABI, amt),
+    stakeTier1: (amt: string) => stake(contracts.tier1Addr, STAKING_ABI, amt),
+    unstakeTier1: (amt: string) => unstake(contracts.tier1Addr, STAKING_ABI, amt),
+    stakeTier2: (amt: string) => stake(contracts.tier2Addr, STAKING_ABI, amt),
+    unstakeTier2: (amt: string) => unstake(contracts.tier2Addr, STAKING_ABI, amt),
     depositTier3: (amt: string) =>
-      write({ abi: TIER3_ABI, address: tier3Addr, functionName: "deposit", args: [amt] } as any),
+      write({ abi: TIER3_ABI, address: contracts.tier3Addr, functionName: "deposit", args: [amt] } as any),
     buyListing: (id: number, value: string) =>
-      write({ abi: MARKETPLACE_ABI, address: marketAddr, functionName: "buy", args: [BigInt(id)] } as any),
-    marketplaceReady: isReal(marketAddr),
-    marketAddr,
+      write({ abi: MARKETPLACE_ABI, address: contracts.marketAddr, functionName: "buy", args: [BigInt(id)] } as any),
+    marketplaceReady: isReal(contracts.marketAddr),
+    marketAddr: contracts.marketAddr,
     marketABI: MARKETPLACE_ABI,
   };
 }

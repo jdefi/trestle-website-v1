@@ -1,7 +1,7 @@
 export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export const CONTRACTS = {
-  amoy: {
+  polygon: {
     hNOBT: "0xcF51ab7398315DbA6588Aa7fb3Df7c99D3D1F4dD",
     broilerPlus: "0xeCb4cAc0C9e5cBd42a9Ed36467ce8f96072AD58b",
     marketplaceCore: "0x...",
@@ -16,9 +16,9 @@ export const CONTRACTS = {
 };
 
 export const LINKS = {
-  telegram: "https://t.me/TrestlePro",
+  telegram: "https://t.me/TrestleDeFi",
   discord: "https://discord.gg/4dCCvnJYGT",
-  github: "https://github.com/Trestle-Protocol",
-  docs: "https://docs.trestleprotocol.io",
+  github: "https://github.com/Trestle-DeFi",
+  docs: "https://github.com/Trestle-DeFi/wiki",
   telegramApp: "https://t.me/trestle_bot/app",
 };

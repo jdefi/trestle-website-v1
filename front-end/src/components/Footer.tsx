@@ -49,7 +49,7 @@ export default function Footer() {
             <li><a href="#" className="hover:text-emerald-400 transition-colors">Privacy</a></li>
           </ul>
           <div className="mt-6 pt-4 border-t border-gray-800">
-            <p className="text-[10px] text-gray-500">© {new Date().getFullYear()} Trestle Protocol</p>
+            <p className="text-[10px] text-gray-500">© {new Date().getFullYear()} Trestle DeFi</p>
           </div>
         </div>
       </div>
