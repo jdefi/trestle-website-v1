@@ -28,7 +28,7 @@ const tokens = [
     role: "Value Capture",
     supply: "1,000,000",
     distribution: "Earned exclusively via Tier 3 staking",
-    utility: "Fee sharing + protocol voting. Fixed max supply.",
+    utility: "Fee sharing + DeFi voting. Fixed max supply.",
     color: "purple",
     extras: [],
   },

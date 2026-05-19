@@ -1,7 +1,7 @@
 {
-  "name": "Trestle Protocol",
-  "short_name": "Trestle",
-  "description": "Decentralized Marketplace for Digital Assets, Freelancers & RWA",
+  "name": "Trestle DeFi",
+  "short_name": "Trestle DeFi",
+  "description": "A decentralized marketplace for freelancers, digital assets, and RWAs. Built with Next.js, Telegram Mini-Apps, and Polygon/EVM integration.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

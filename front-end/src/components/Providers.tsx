@@ -10,7 +10,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const initialized = useRef(false);
 
   useEffect(() => {
-    if (!initialized.current) {
+    if (!initialized.current && typeof window !== "undefined" && projectId) {
       createWeb3Modal({
         wagmiConfig: config,
         projectId,

@@ -37,7 +37,7 @@ export default function Hero() {
             Launch dApp
           </Link>
           <a
-            href="https://t.me/TrestlePro"
+            href="https://t.me/TrestleDeFi"
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 sm:flex-none px-6 py-3 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-xl

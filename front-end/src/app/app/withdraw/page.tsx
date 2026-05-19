@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useAccount, useBalance } from "wagmi";
+import { polygon } from "wagmi/chains";
 import { useContracts } from "@/hooks/useContracts";
 
 export default function WithdrawPage() {
   const { address, isConnected } = useAccount();
-  const { data: native } = useBalance({ address });
+  const { data: native } = useBalance({ address, chainId: polygon.id });
   const { hNOBTBalance, brtBalance } = useContracts();
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -25,14 +26,12 @@ export default function WithdrawPage() {
   return (
     <div className="max-w-md mx-auto space-y-4">
       <h2 className="text-xl font-semibold">Wallet</h2>
-      {!isConnected ? (
-        <p className="text-gray-400 text-sm">Connect wallet to view balance.</p>
-      ) : (
+      {isConnected ? (
         <div className="space-y-3">
           <div className="bg-white rounded-xl border p-4 space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-gray-500">MATIC</span><span className="font-medium">{nativeBalance}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">MATIC (Polygon)</span><span className="font-medium">{nativeBalance}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">hNOBT</span><span className="font-medium">{(BigInt(hNOBTBalance || "0") / 10n ** 18n).toString()}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">BRT</span><span className="font-medium">{(BigInt(brtBalance || "0") / 10n ** 18n).toString()}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">BRT</span><span className="font-medium">{(BigInt(brtBalance || "0") / 10n ** 9n).toString()}</span></div>
           </div>
           <button onClick={withdrawNative} disabled={busy === "matic"}
             className="w-full py-3 bg-emerald-500 text-white rounded-lg font-medium disabled:opacity-50">
@@ -43,6 +42,8 @@ export default function WithdrawPage() {
             Withdraw Tokens (coming soon)
           </button>
         </div>
+      ) : (
+        <p className="text-gray-400 text-sm">Connect wallet to view balance.</p>
       )}
     </div>
   );

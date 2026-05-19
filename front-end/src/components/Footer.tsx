@@ -7,12 +7,12 @@ export default function Footer() {
     <footer className="bg-gray-900 text-gray-400">
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-5 gap-8">
         <div>
-          <h3 className="text-white font-semibold mb-3">Protocol</h3>
+          <h3 className="text-white font-semibold mb-3">Trestle</h3>
           <ul className="space-y-2 text-sm">
             <li><Link href="/#features" className="hover:text-emerald-400 transition-colors">Features</Link></li>
             <li><Link href="/#tokens" className="hover:text-emerald-400 transition-colors">Tokenomics</Link></li>
             <li><Link href="/#roadmap" className="hover:text-emerald-400 transition-colors">Roadmap</Link></li>
-            <li><a href="https://docs.trestleprotocol.io" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">Docs</a></li>
+            <li><a href={LINKS.docs} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">Docs</a></li>
           </ul>
         </div>
         <div>
@@ -39,7 +39,7 @@ export default function Footer() {
             <a href={LINKS.discord} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">Discord</a>
             <a href={LINKS.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">Telegram</a>
             <a href="mailto:contact@trestle.website" className="hover:text-emerald-400 transition-colors">contact@trestle.website</a>
-            <a href="https://github.com/Trestle-Protocol" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">GitHub</a>
+            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">GitHub</a>
           </div>
         </div>
         <div>
@@ -49,7 +49,7 @@ export default function Footer() {
             <li><a href="#" className="hover:text-emerald-400 transition-colors">Privacy</a></li>
           </ul>
           <div className="mt-6 pt-4 border-t border-gray-800">
-            <p className="text-[10px] text-gray-500">© {new Date().getFullYear()} Trestle Protocol</p>
+            <p className="text-[10px] text-gray-500">© {new Date().getFullYear()} Trestle DeFi</p>
           </div>
         </div>
       </div>

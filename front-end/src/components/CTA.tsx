@@ -44,14 +44,14 @@ export default function CTA() {
             </a>
           </div>
           <a
-            href={LINKS.telegram}
+            href={LINKS.telegramApp}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 sm:flex-none px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl
                       transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl
                       border border-emerald-600 hover:border-transparent"
           >
-            💬 Telegram
+            💬 Telegram Mini App
           </a>
         </div>
         <div className="mt-12 flex justify-center">

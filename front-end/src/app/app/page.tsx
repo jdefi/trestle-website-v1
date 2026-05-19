@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { useContracts } from "@/hooks/useContracts";
 import { LINKS } from "@/config/contracts";
@@ -12,6 +12,11 @@ export default function AppDashboard() {
 
   const [copied, setCopied] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const refLink = address
     ? `${typeof window !== "undefined" ? window.location.origin : ""}/verify?ref=${address}`
@@ -26,7 +31,7 @@ export default function AppDashboard() {
 
   return (
     <div className="space-y-6">
-      {!isConnected ? (
+      {!mounted || !isConnected ? (
         <div className="text-center py-20 bg-white rounded-2xl border">
           <h2 className="text-xl font-semibold text-gray-700">Connect your wallet</h2>
           <p className="text-sm text-gray-400 mt-2 mb-4">
@@ -45,24 +50,24 @@ export default function AppDashboard() {
         <>
           <div className="bg-emerald-500 rounded-2xl p-6 text-white">
             <p className="text-sm opacity-80">Your Portfolio</p>
-            <div className="mt-3 space-y-2">
-              <div className="flex justify-between">
-                <span>MATIC</span>
-                <span className="font-bold">{nativeBalance}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>hNOBT</span>
-                <span className="font-bold">
-                  {(BigInt(hNOBTBalance || "0") / 10n ** 18n).toString()}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>BRT</span>
-                <span className="font-bold">
-                  {(BigInt(brtBalance || "0") / 10n ** 18n).toString()}
-                </span>
-              </div>
-            </div>
+           <div className="mt-3 space-y-2">
+               <div className="flex justify-between">
+                 <span>MATIC (Polygon)</span>
+                 <span className="font-bold">{nativeBalance}</span>
+               </div>
+               <div className="flex justify-between">
+                 <span>hNOBT</span>
+                 <span className="font-bold">
+                   {(BigInt(hNOBTBalance || "0") / 10n ** 18n).toString()}
+                 </span>
+               </div>
+               <div className="flex justify-between">
+                 <span>BRT</span>
+                 <span className="font-bold">
+                   {(BigInt(brtBalance || "0") / 10n ** 9n).toString()}
+                 </span>
+               </div>
+             </div>
             <p className="text-xs opacity-60 mt-3">
               {address?.slice(0, 8)}...{address?.slice(-6)}
             </p>

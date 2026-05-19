@@ -1,20 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useBalance, useSignMessage } from "wagmi";
 import QRCode from "./QRCode";
 
 export default function W3mButton() {
   const ref = useRef<HTMLDivElement>(null);
   const [qrOpen, setQrOpen] = useState(false);
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { data: native } = useBalance({ address, chainId });
 
   const handleSignMessage = async () => {
     if (!address) return;
     try {
       await signMessageAsync({
-        message: `Welcome to Trestle Protocol! By signing this message, you confirm your identity and agree to our Terms of Service. Nonce: ${Date.now()}`,
+        message: `Welcome to Trestle DeFi! By signing this message, you confirm your identity and agree to our Terms of Service. Nonce: ${Date.now()}`,
       });
     } catch {
       // Silently ignore — user may reject
@@ -37,6 +38,11 @@ export default function W3mButton() {
   return (
     <div className="flex items-center gap-2">
       <div ref={ref} />
+      {isConnected && native && (
+        <span className="hidden sm:inline text-xs text-gray-500 font-medium">
+          {(Number(native.value) / 10 ** native.decimals).toFixed(4)} {native.symbol}
+        </span>
+      )}
       {isConnected && (
         <>
           <button

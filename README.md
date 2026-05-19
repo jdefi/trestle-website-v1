@@ -5,6 +5,7 @@
 **A decentralized marketplace for digital assets, freelancer services, and real-world assets (RWA).**
 
 ---
+> **Disclaimer:** Not affiliated with Trestle Protocol (Celestia Bridge).
 
 ## 🚀 Getting Started
 
@@ -19,7 +20,7 @@
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/Trestle-Protocol/trestle.git
+   git clone https://github.com/Trestle-DeFi/trestle.git
    cd trestle
    ```
 
@@ -85,8 +86,8 @@ npm start
 ```
 ## 📬 Contact
 - **Website**: [https://trestle.website](https://trestle.website)
-- **GitHub**: [Trestle Protocol](https://github.com/Trestle-Protocol)
+- **GitHub**: [Trestle Protocol](https://github.com/Trestle-DeFi)
 - **Discord**: [Trestle Protocol](https://discord.gg/4dCCvnJYGT)
-- **Telegram**: [Trestle Pro](https://t.me/TrestlePro)
+- **Telegram**: [Trestle Pro](https://t.me/TrestleDeFi)
 - **Email**: contact@trestle.website
 

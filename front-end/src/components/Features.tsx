@@ -9,7 +9,7 @@ const features = [
   },
   {
     title: "Three-Tier Staking",
-    desc: "hNOBT → BroilerPlus → Governance. Each tier unlocks greater rewards and protocol ownership.",
+    desc: "hNOBT → BroilerPlus → Governance. Each tier unlocks greater rewards and DeFi ownership.",
     icon: "🏗️",
     color: "blue",
   },

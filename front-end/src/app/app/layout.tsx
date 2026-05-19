@@ -15,7 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="text-lg font-bold text-emerald-600">← Trestle</Link>
           <a
-            href="https://t.me/TrestlePro"
+            href="https://t.me/TrestleDeFi"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-gray-500 hover:text-emerald-600 transition flex items-center gap-1"
@@ -52,7 +52,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex gap-4 text-xs text-gray-400">
             <a href="https://discord.gg/4dCCvnJYGT" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition">💎 Discord</a>
-            <a href="https://t.me/TrestlePro" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition">💬 Telegram</a>
+            <a href="https://t.me/TrestleDeFi" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition">💬 Telegram</a>
             <a href="mailto:contact@trestle.website" className="hover:text-emerald-500 transition">✉️ Contact</a>
           </div>
           <div className="flex items-center gap-3">

@@ -14,11 +14,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Trestle Protocol | Decentralized Marketplace",
-    template: "%s | Trestle Protocol",
+    default: "Trestle DeFi | Decentralized Marketplace",
+    template: "%s | Trestle DeFi",
   },
   description:
-    "Trestle Protocol bridges DeFi with real-world utility. Earn, stake, and own through a three-tier ecosystem powered by hNOBT, BroilerPlus, and Governance tokens.",
+    "A decentralized marketplace for freelancers, digital assets, and RWAs. Built with Next.js, Telegram Mini-Apps, and Polygon/EVM integration.",
   keywords: ["decentralized marketplace", "web3 freelancer", "RWA tokenization", "DeFi", "crypto staking"],
   icons: {
     icon: "/favicon.svg",
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "Trestle Protocol",
-    description: "A self-sustaining economic bridge between the gig economy and real-world assets.",
+    title: "Trestle DeFi",
+    description: "A decentralized marketplace for freelancers, digital assets, and RWAs. Built with Next.js, Telegram Mini-Apps, and Polygon/EVM integration.",
     type: "website",
     images: ["/logo.svg"],
   },
@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           <main>{children}</main>
           <Footer />
-          {/* <AstraChat /> */}
+          <AstraChat />
         </Providers>
       </body>
     </html>

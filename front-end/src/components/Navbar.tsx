@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useState } from "react";
 import W3mButton from "./W3mButton";
 import Icon from "./Icon";
+import { LINKS } from "@/config/contracts";
 
 const NAV_LINKS = [
   { href: "/#features", label: "Features" },
   { href: "/#tokens", label: "Tokens" },
   { href: "/#roadmap", label: "Roadmap" },
   { href: "/app", label: "App" },
-  { href: "https://docs.trestleprotocol.io", label: "Docs", external: true },
+  { href: LINKS.docs, label: "Docs", external: true },
   { href: "https://reward.trestle.website", label: "Reward Hub", external: true },
   { href: "https://testnet.trestle.website", label: "Testnet", external: true },
 ];
@@ -54,7 +55,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <W3mButton />
             <a
-              href="https://t.me/TrestlePro"
+              href="https://t.me/TrestleDeFi"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
@@ -104,7 +105,7 @@ export default function Navbar() {
               )
             )}
             <a
-              href="https://t.me/TrestlePro"
+              href="https://t.me/TrestleDeFi"
               target="_blank"
               rel="noopener noreferrer"
               className="block py-2 text-sm text-gray-600 hover:text-emerald-600 transition-colors"

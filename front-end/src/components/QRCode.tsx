@@ -40,7 +40,7 @@ export function useWalletSign() {
   useEffect(() => {
     if (isConnected && address && !signed) {
       signMessageAsync({
-        message: `Welcome to Trestle Protocol! This message confirms your identity. Nonce: ${Date.now()}`,
+        message: `Welcome to Trestle DeFi! This message confirms your identity. Nonce: ${Date.now()}`,
       })
         .then(() => setSigned(true))
         .catch(() => {});
