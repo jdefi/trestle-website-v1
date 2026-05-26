@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 const features = [
   {
     title: "Zero-Friction Onboarding",
@@ -9,7 +7,7 @@ const features = [
   },
   {
     title: "Three-Tier Staking",
-    desc: "hNOBT → BroilerPlus → Governance. Each tier unlocks greater rewards and DeFi ownership.",
+    desc: "hNOBT → BroilerPlus → Governance. Each tier unlocks greater rewards and protocol ownership.",
     icon: "🏗️",
     color: "blue",
   },

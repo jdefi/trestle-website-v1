@@ -1,12 +1,11 @@
-import { http, createConfig } from "wagmi";
+import { http } from "wagmi";
 import { fallback } from "viem";
 import { polygon } from "wagmi/chains";
-import { walletConnect, injected } from "wagmi/connectors";
-import { authConnector } from "@web3modal/wagmi";
+import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
+import { createAppKit } from "@reown/appkit/react";
 
 export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
 
-// Biconomy configuration for gasless transactions
 export const biconomyConfig = {
   apiKey: process.env.NEXT_PUBLIC_BICONOMY_API_KEY || "",
   contractAddresses: [
@@ -19,7 +18,6 @@ export const biconomyPaymaster = biconomyConfig.apiKey
   ? `https://paymaster.biconomy.io/api/v1/paymaster/${biconomyConfig.apiKey}`
   : "";
 
-// Polygon mainnet RPC providers with fallback for load balancing
 const polygonTransports = [
   http("https://polygon-rpc.com", { retryCount: 2, retryDelay: 500 }),
   http("https://polygon.llamarpc.com", { retryCount: 2, retryDelay: 500 }),
@@ -28,20 +26,50 @@ const polygonTransports = [
   process.env.NEXT_PUBLIC_BLOCKSCOUT_API ? http(process.env.NEXT_PUBLIC_BLOCKSCOUT_API, { retryCount: 2, retryDelay: 500 }) : null,
 ].filter(Boolean) as ReturnType<typeof http>[];
 
-export const config = createConfig({
-  chains: [polygon],
-  connectors: [
-    walletConnect({ projectId, showQrModal: false }),
-    injected(),
-    authConnector({
-      options: { projectId },
-      email: true,
-      socials: ["google", "github", "discord"],
-      showWallets: true,
-      walletFeatures: true,
-    }),
-  ],
+const wagmiAdapter = new WagmiAdapter({
+  ssr: true,
+  projectId,
+  networks: [polygon],
   transports: {
     [polygon.id]: fallback(polygonTransports, { rank: true }),
+  },
+});
+
+export const config = wagmiAdapter.wagmiConfig;
+
+// Get the correct URL based on environment
+const getMetadataUrl = () => {
+  if (typeof window !== "undefined") {
+    // Client-side: use current window location
+    return window.location.origin;
+  }
+  
+  // Server-side: check for Vercel or localhost
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  
+  // Default for local development
+  return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+};
+
+createAppKit({
+  adapters: [wagmiAdapter],
+  projectId,
+  networks: [polygon],
+  metadata: {
+    name: "Trestle DeFi",
+    description: "Trestle DeFi Platform",
+    url: getMetadataUrl(),
+    icons: ["/favicon.ico"],
+  },
+  features: {
+    email: true,
+    socials: ["google", "github", "discord"],
+  },
+  themeMode: "light",
+  themeVariables: {
+    "--w3m-color-mix": "#059669",
+    "--w3m-color-mix-strength": 20,
   },
 });

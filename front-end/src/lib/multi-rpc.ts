@@ -114,7 +114,13 @@ class MultiRpcProvider {
       case "latency":
         return healthy.sort((a, b) => (a.health!.latency) - (b.health!.latency))[0];
       case "healthy":
-        return healthy.sort((a, b) => (b.health!.blockNumber ?? 0n) > (a.health!.blockNumber ?? 0n) ? 1 : -1)[0];
+        return healthy.sort((a, b) => {
+          const bnA = a.health!.blockNumber ?? 0n;
+          const bnB = b.health!.blockNumber ?? 0n;
+          if (bnB > bnA) return 1;
+          if (bnB < bnA) return -1;
+          return 0;
+        })[0];
       case "round-robin":
         this.rrIndex = (this.rrIndex + 1) % healthy.length;
         return healthy[this.rrIndex];

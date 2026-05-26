@@ -5,11 +5,9 @@
 **A decentralized marketplace for digital assets, freelancer services, and real-world assets (RWA).**
 
 ---
-<<<<<<< HEAD
-> **Disclaimer:** Not affiliated with Trestle Protocol (Celestia Bridge).
+
+ **Disclaimer:** Not affiliated with Trestle Protocol (Celestia Bridge).
 =======
-> **Disclaimer:** Not affiliated with Trestle DeFi (Celestia Bridge).
->>>>>>> d9be4df68db168e6f1a3f7e4e92b6fd2c486586e
 
 ## 🚀 Getting Started
 
@@ -83,9 +81,9 @@ trestle-website-v1/
 
 - `/` — Landing page
 - `/app` — Dashboard (Portfolio display)
-- `/app/stake/tier1` — Stake Tier 1
-- `/app/stake/tier2` — Stake Tier 2
-- `/app/stake/tier3` — Stake Tier 3
+- `/app/stake` — Stake hNOBT
+- `/app/mine` — Mine LP
+- `/app/vault` — Governor Vault
 - `/app/marketplace` — Digital goods marketplace
 - `/app/withdraw` — Withdraw interface
 

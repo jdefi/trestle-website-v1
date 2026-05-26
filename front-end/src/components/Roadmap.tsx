@@ -15,7 +15,7 @@ const phases = [
     phase: "Phase 3",
     title: "The Flywheel",
     date: "Q2 2026",
-    items: ["hNOBT staking → mine BroilerPlus", "BroilerPlus LP mining program", "Governor Vaults (Tier 3)", "Kleros escrow integration"],
+    items: ["hNOBT staking → mine BroilerPlus", "BroilerPlus LP mining program", "Governor Vaults", "Kleros escrow integration"],
   },
   {
     phase: "Phase 4",

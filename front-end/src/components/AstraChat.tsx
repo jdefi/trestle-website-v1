@@ -14,9 +14,9 @@ export default function AstraChat() {
 
   useEffect(() => { bottom.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-  const send = async () => {
-    if (!input.trim() || busy) return;
-    const msg = input.trim();
+  const send = async (override?: string) => {
+    const msg = (override ?? input).trim();
+    if (!msg || busy) return;
     setInput("");
     setMessages(prev => [...prev, { role: "user", text: msg }]);
     setBusy(true);
@@ -34,8 +34,8 @@ export default function AstraChat() {
       <button
         onClick={() => setOpen(true)}
         className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-emerald-600 text-white text-2xl
-                  shadow-2xl hover:bg-emerald-700 transition-all duration-300 transform hover:scale-105
-                  flex items-center justify-center"
+                   shadow-2xl hover:bg-emerald-700 transition-all duration-300 transform hover:scale-105
+                   flex items-center justify-center"
       >
         <span className="animate-pulse">🧠</span>
       </button>
@@ -44,7 +44,7 @@ export default function AstraChat() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col"
-         style={{ maxHeight: "80vh" }}>
+          style={{ maxHeight: "80vh" }}>
       <div className="flex items-center justify-between px-5 py-4 bg-emerald-600 text-white">
         <div className="flex items-center gap-3">
           <span className="text-xl">🧠</span>
@@ -68,28 +68,19 @@ export default function AstraChat() {
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               <button
-                onClick={() => {
-                  setInput("How do I connect my wallet?");
-                  send();
-                }}
+                onClick={() => send("How do I connect my wallet?")}
                 className="px-3 py-1 text-xs bg-emerald-50 text-emerald-600 rounded-full hover:bg-emerald-100 transition-colors"
               >
                 Wallet Help
               </button>
               <button
-                onClick={() => {
-                  setInput("What is hNOBT?");
-                  send();
-                }}
+                onClick={() => send("What is hNOBT?")}
                 className="px-3 py-1 text-xs bg-emerald-50 text-emerald-600 rounded-full hover:bg-emerald-100 transition-colors"
               >
                 hNOBT Info
               </button>
               <button
-                onClick={() => {
-                  setInput("How does staking work?");
-                  send();
-                }}
+                onClick={() => send("How does staking work?")}
                 className="px-3 py-1 text-xs bg-emerald-50 text-emerald-600 rounded-full hover:bg-emerald-100 transition-colors"
               >
                 Staking Guide
@@ -125,15 +116,15 @@ export default function AstraChat() {
           onKeyDown={e => e.key === "Enter" && send()}
           placeholder="Ask Astra..."
           className="flex-1 min-h-[44px] border border-gray-300 rounded-lg px-4 py-2 text-sm
-                    focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200
-                    transition-all duration-200"
+                     focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200
+                     transition-all duration-200"
         />
         <button
-          onClick={send}
+          onClick={() => send()}
           disabled={busy || !input.trim()}
           className="flex-shrink-0 px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium
-                    hover:bg-emerald-700 transition-all duration-200 transform hover:scale-105
-                    disabled:opacity-50 disabled:cursor-not-allowed shadow hover:shadow-md"
+                     hover:bg-emerald-700 transition-all duration-200 transform hover:scale-105
+                     disabled:opacity-50 disabled:cursor-not-allowed shadow hover:shadow-md"
         >
           Send
         </button>

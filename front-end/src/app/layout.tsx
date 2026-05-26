@@ -1,9 +1,17 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
+import MobileQrButton from "@/components/MobileQrButton";
+import AstraChat from "@/components/AstraChat";
 import Footer from "@/components/Footer";
-import AstraChat from "@/components/AstraChatWrapper";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -17,18 +25,10 @@ export const metadata: Metadata = {
     default: "Trestle DeFi | Decentralized Marketplace",
     template: "%s | Trestle DeFi",
   },
-  description:
-    "A decentralized marketplace for freelancers, digital assets, and RWAs. Built with Next.js, Telegram Mini-Apps, and Polygon/EVM integration.",
-  keywords: ["decentralized marketplace", "web3 freelancer", "RWA tokenization", "DeFi", "crypto staking"],
-  icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/apple-touch-icon.png",
-  },
-  manifest: "/site.webmanifest",
+  description: "A self-sustaining economic bridge between the gig economy and real-world assets.",
   openGraph: {
     title: "Trestle DeFi",
-    description: "A decentralized marketplace for freelancers, digital assets, and RWAs. Built with Next.js, Telegram Mini-Apps, and Polygon/EVM integration.",
+    description: "A self-sustaining economic bridge between the gig economy and real-world assets.",
     type: "website",
     images: ["/logo.svg"],
   },
@@ -41,10 +41,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className={`${inter.variable} scroll-smooth`}>
       <body className="min-h-screen bg-white text-gray-900 antialiased">
         <Providers>
           <Navbar />
+          <MobileQrButton />
           <main>{children}</main>
           <Footer />
           <AstraChat />

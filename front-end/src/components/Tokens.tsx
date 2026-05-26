@@ -1,6 +1,6 @@
 const tokens = [
   {
-    tier: "Tier 1",
+    tier: "Stake",
     name: "hNOBT",
     role: "Community Growth",
     supply: "1,000,000,000",
@@ -10,7 +10,7 @@ const tokens = [
     extras: [],
   },
   {
-    tier: "Tier 2",
+    tier: "Mine",
     name: "BroilerPlus (BRT)",
     role: "Liquidity Anchor",
     supply: "1,000,000,000,000,000 (1 Quadrillion)",
@@ -23,12 +23,12 @@ const tokens = [
     ],
   },
   {
-    tier: "Tier 3",
+    tier: "Vault",
     name: "Governance Token",
     role: "Value Capture",
     supply: "1,000,000",
-    distribution: "Earned exclusively via Tier 3 staking",
-    utility: "Fee sharing + DeFi voting. Fixed max supply.",
+    distribution: "Earned exclusively via Vault staking",
+    utility: "Fee sharing + protocol voting. Fixed max supply.",
     color: "purple",
     extras: [],
   },

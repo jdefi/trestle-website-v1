@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useContracts } from "@/hooks/useContracts";
 
-export default function Tier3Page() {
+export default function VaultPage() {
   const { isConnected } = useAccount();
   const { depositTier3 } = useContracts();
   const [amount, setAmount] = useState("");
@@ -20,9 +20,8 @@ export default function Tier3Page() {
 
   return (
     <div className="max-w-md mx-auto space-y-4">
-      <h2 className="text-xl font-semibold">Tier 3: Governor Vault</h2>
+      <h2 className="text-xl font-semibold">Vault</h2>
       <p className="text-sm text-gray-500">ERC-4626 vault. Deposit LP, earn Governance tokens + fee share.</p>
-
       <div className="bg-purple-50 rounded-xl border border-purple-200 p-4 text-sm text-purple-700">
         <p className="font-medium">Loyalty Multipliers</p>
         <ul className="mt-2 space-y-1 text-xs">
@@ -31,7 +30,6 @@ export default function Tier3Page() {
           <li>1 year: 2x GOV rewards</li>
         </ul>
       </div>
-
       {!isConnected ? (
         <p className="text-gray-400 text-sm">Connect wallet to enter vault.</p>
       ) : (

@@ -1,11 +1,17 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { LINKS } from "@/config/contracts";
 import Icon from "./Icon";
+import QRCode from "./QRCode";
 
 export default function Footer() {
+  const [qrOpen, setQrOpen] = useState(false);
+
   return (
     <footer className="bg-gray-900 text-gray-400">
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-5 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-6 gap-8">
         <div>
           <h3 className="text-white font-semibold mb-3">Trestle</h3>
           <ul className="space-y-2 text-sm">
@@ -52,7 +58,42 @@ export default function Footer() {
             <p className="text-[10px] text-gray-500">© {new Date().getFullYear()} Trestle DeFi</p>
           </div>
         </div>
+        <div className="flex items-start justify-end">
+          <button
+            onClick={() => setQrOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-400 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            <span className="text-lg">📱</span>
+            <span>Open on Mobile</span>
+          </button>
+        </div>
       </div>
+      {qrOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+          onClick={() => setQrOpen(false)}
+        >
+          <div
+            className="bg-white rounded-3xl p-6 shadow-2xl border border-gray-100 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-gray-700">Open Trestle on mobile</span>
+              <button
+                onClick={() => setQrOpen(false)}
+                className="text-gray-400 hover:text-gray-600 text-lg"
+              >
+                ✕
+              </button>
+            </div>
+            <QRCode
+              value="https://trestle.website"
+              size={350}
+              altText="Scan QR code to open Trestle on mobile device"
+            />
+          </div>
+        </div>
+      )}
     </footer>
   );
 }

@@ -1,4 +1,3 @@
-import { api } from "./api";
 import { API_BASE } from "@/config/contracts";
 
 const ASTRA_BASE = (process.env.NEXT_PUBLIC_ASTRA_API_URL as string) || API_BASE;

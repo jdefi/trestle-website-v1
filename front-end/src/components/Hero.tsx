@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { QRCodeSVG } from "qrcode.react";
+import { LINKS } from "@/config/contracts";
 
 export default function Hero() {
   return (
@@ -37,7 +37,7 @@ export default function Hero() {
             Launch dApp
           </Link>
           <a
-            href="https://t.me/TrestleDeFi"
+            href={LINKS.telegram}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 sm:flex-none px-6 py-3 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-xl
@@ -53,13 +53,6 @@ export default function Hero() {
           >
             Learn More &rarr;
           </Link>
-        </div>
-
-        {/* QR Code below hero on desktop */}
-        <div className="hidden md:block mt-10">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 p-4 inline-block">
-            <QRCodeSVG value="https://trestle.website" size={150} />
-          </div>
         </div>
 
         <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-5 max-w-3xl mx-auto">

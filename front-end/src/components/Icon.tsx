@@ -1,7 +1,11 @@
-type IconName = "logo" | "spinner" | "discord" | "telegram" | "github" | "globe" | "email" | "x";
+interface IconProps {
+  name: string;
+  size?: number;
+  className?: string;
+}
 
-export default function Icon({ name, size = 24, className = "" }: { name: IconName; size?: number; className?: string }) {
-  const icons = {
+const Icon = ({ name, size = 24, className = "" }: IconProps) => {
+  const icons: Record<string, React.ReactNode> = {
     logo: (
       <svg viewBox="0 0 256 256" fill="none" className={className} style={{ width: size, height: size }}>
         <defs>
@@ -18,9 +22,7 @@ export default function Icon({ name, size = 24, className = "" }: { name: IconNa
     ),
     spinner: (
       <svg viewBox="0 0 32 32" className={className} style={{ width: size, height: size }}>
-        <circle cx="16" cy="16" r="12" fill="none" stroke="#059669" strokeWidth="3" strokeDasharray="70 30" strokeLinecap="round">
-          <animateTransform attributeName="transform" type="rotate" from="0 16 16" to="360 16 16" dur="1s" repeatCount="indefinite"/>
-        </circle>
+        <circle cx="16" cy="16" r="12" fill="none" stroke="#059669" strokeWidth="3" strokeDasharray="70 30" strokeLinecap="round"/>
       </svg>
     ),
     discord: (
@@ -58,4 +60,6 @@ export default function Icon({ name, size = 24, className = "" }: { name: IconNa
     ),
   };
   return icons[name] || null;
-}
+};
+
+export default Icon;

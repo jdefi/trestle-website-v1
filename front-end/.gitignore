@@ -1,8 +1,10 @@
 # Next.js
 node_modules/
 .env
-.env.local
+.env.*
 .next/
 out/
 *.log
 .DS_Store
+.turbo/
+.vercel/

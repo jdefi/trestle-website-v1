@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useAccount, useBalance, useSignMessage } from "wagmi";
-import QRCode from "./QRCode";
+import { useEffect, useRef } from "react";
+import { useAccount, useSignMessage } from "wagmi";
 
 export default function W3mButton() {
   const ref = useRef<HTMLDivElement>(null);
-  const [qrOpen, setQrOpen] = useState(false);
-  const { address, isConnected, chainId } = useAccount();
+  const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
-  const { data: native } = useBalance({ address, chainId });
 
   const handleSignMessage = async () => {
     if (!address) return;
@@ -38,36 +35,6 @@ export default function W3mButton() {
   return (
     <div className="flex items-center gap-2">
       <div ref={ref} />
-      {isConnected && native && (
-        <span className="hidden sm:inline text-xs text-gray-500 font-medium">
-          {(Number(native.value) / 10 ** native.decimals).toFixed(4)} {native.symbol}
-        </span>
-      )}
-      {isConnected && (
-        <>
-          <button
-            onClick={() => setQrOpen(true)}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"
-          >
-            <span className="text-base">📱</span>
-            <span className="hidden lg:inline">Mobile</span>
-          </button>
-          {qrOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-                 onClick={() => setQrOpen(false)}>
-              <div className="bg-white rounded-3xl p-6 shadow-2xl border border-gray-100"
-                   onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-semibold text-gray-700">Open on mobile</span>
-                  <button onClick={() => setQrOpen(false)}
-                          className="text-gray-400 hover:text-gray-600 text-lg">✕</button>
-                </div>
-                <QRCode value={typeof window !== "undefined" ? window.location.href : "https://trestle.website"} />
-              </div>
-            </div>
-          )}
-        </>
-      )}
     </div>
   );
 }
