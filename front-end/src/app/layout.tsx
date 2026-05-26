@@ -4,7 +4,7 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
 import MobileQrButton from "@/components/MobileQrButton";
-import AstraChat from "@/components/AstraChat";
+import AstraChatWrapper from "@/components/AstraChatWrapper";
 import Footer from "@/components/Footer";
 
 const inter = Inter({
@@ -37,6 +37,11 @@ export const metadata: Metadata = {
     follow: true,
   },
   metadataBase: new URL("https://trestle.website"),
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -48,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MobileQrButton />
           <main>{children}</main>
           <Footer />
-          <AstraChat />
+          <AstraChatWrapper />
         </Providers>
       </body>
     </html>

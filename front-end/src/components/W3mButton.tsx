@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useAccount, useSignMessage } from "wagmi";
 
 export default function W3mButton() {
-  const ref = useRef<HTMLDivElement>(null);
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
 
@@ -20,13 +19,6 @@ export default function W3mButton() {
   };
 
   useEffect(() => {
-    if (!ref.current) return;
-    ref.current.innerHTML = "";
-    const btn = document.createElement("w3m-button");
-    ref.current.appendChild(btn);
-  }, [isConnected]);
-
-  useEffect(() => {
     if (isConnected && address) {
       handleSignMessage();
     }
@@ -34,7 +26,7 @@ export default function W3mButton() {
 
   return (
     <div className="flex items-center gap-2">
-      <div ref={ref} />
+      <w3m-button balance="show" />
     </div>
   );
 }
