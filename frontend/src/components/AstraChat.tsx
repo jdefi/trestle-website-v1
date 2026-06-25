@@ -45,7 +45,7 @@ export default function AstraChat() {
                   shadow-2xl hover:bg-emerald-700 transition-all duration-300 transform hover:scale-105
                   flex items-center justify-center"
       >
-        <span className="animate-pulse">\uD83E\uDD16</span>
+        <span className="animate-pulse">{'\uD83E\uDD16'}</span>
       </button>
     );
   }
