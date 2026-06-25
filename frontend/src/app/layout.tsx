@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | Trestle DeFi",
   },
   description:
-    "Trestle DeFi bridges blockchain with real-world utility. Earn, stake, and own through a three-tier ecosystem powered by hNOBT, BroilerPlus, and Governance tokens.",
+    "Trestle DeFi bridges blockchain with real-world utility. Earn, stake, and own through an ecosystem powered by hNOBT, BroilerPlus, and Governance tokens.",
   keywords: ["decentralized marketplace", "web3 freelancer", "RWA tokenization", "DeFi", "crypto staking"],
   icons: {
     icon: "/favicon.svg",

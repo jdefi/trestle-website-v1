@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useContracts } from "@/hooks/useContracts";
-import { LINKS } from "@/config/contracts";
 import QRCode from "@/components/QRCode";
 
 const fmt = (n: string | number) => Number(n).toLocaleString("en-US");
@@ -14,7 +13,6 @@ export default function AppDashboard() {
 
   const [showRefModal, setShowRefModal] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [qrOpen, setQrOpen] = useState(false);
 
   const REF_BASE = "https://trestle.website/verify?ref=";
   const refLink = address ? `${REF_BASE}${address}` : "";
@@ -119,19 +117,19 @@ export default function AppDashboard() {
               {
                 title: "Stake",
                 desc: "Stake hNOBT to earn BRT rewards",
-                href: "/app/stake/tier1",
+                href: "/app/stake",
                 color: "border-emerald-200 bg-emerald-50",
               },
               {
                 title: "Mine",
                 desc: "Stake BRT/WPOL LP to mine BRT",
-                href: "/app/stake/tier2",
+                href: "/app/mine",
                 color: "border-blue-200 bg-blue-50",
               },
               {
                 title: "Vault",
                 desc: "Governance token staking & vault",
-                href: "/app/stake/tier3",
+                href: "/app/vault",
                 color: "border-purple-200 bg-purple-50",
               },
             ].map((card) => (
@@ -146,65 +144,7 @@ export default function AppDashboard() {
             ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <a
-              href={LINKS.telegramApp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-4 hover:border-emerald-300 transition"
-            >
-              <div>
-                <h3 className="font-semibold text-sm">Telegram Mini App</h3>
-                <p className="text-xs text-gray-500 mt-1">
-                  Open the Trestle marketplace in Telegram
-                </p>
-              </div>
-              <span className="text-2xl">💬</span>
-            </a>
-            <button
-              onClick={() => setQrOpen(true)}
-              className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-4 hover:border-emerald-300 transition"
-            >
-              <div>
-                <h3 className="font-semibold text-sm">Open on Mobile</h3>
-                <p className="text-xs text-gray-500 mt-1">
-                  Scan QR code with your phone
-                </p>
-              </div>
-              <span className="text-2xl">📱</span>
-            </button>
-          </div>
 
-          {qrOpen && (
-            <div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-              onClick={() => setQrOpen(false)}
-            >
-              <div
-                className="bg-white rounded-3xl p-6 shadow-2xl border border-gray-100"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-semibold text-gray-700">
-                    Open on mobile
-                  </span>
-                  <button
-                    onClick={() => setQrOpen(false)}
-                    className="text-gray-400 hover:text-gray-600 text-lg"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <QRCode
-                  value={
-                    typeof window !== "undefined"
-                      ? window.location.href
-                      : "https://trestle.website"
-                  }
-                />
-              </div>
-            </div>
-          )}
         </>
       )}
     </div>

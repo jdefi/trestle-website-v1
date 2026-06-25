@@ -3,7 +3,7 @@ const phases = [
     phase: "Phase 1",
     title: "Foundation",
     date: "Q1-Q3 2025",
-    items: ["Telegram Mini-App with social login", "hNOBT & BroilerPlus live on Polygon", "Account Abstraction (ERC-4337)", "Airdrop & referral programs"],
+    items: ["Telegram Mini-App with social login", "hNOBT & BroilerPlus live on Polygon", "Airdrop & referral programs"],
   },
   {
     phase: "Phase 2",
@@ -15,7 +15,7 @@ const phases = [
     phase: "Phase 3",
     title: "The Flywheel",
     date: "Q2 2026",
-    items: ["hNOBT staking → mine BroilerPlus", "BroilerPlus LP mining program", "Governor Vaults (Tier 3)", "Kleros escrow integration"],
+    items: ["Stake hNOBT, mine BRT via LP staking", "BroilerPlus LP mining program", "Governor Vaults (Tier 3)", "Kleros escrow integration"],
   },
   {
     phase: "Phase 4",

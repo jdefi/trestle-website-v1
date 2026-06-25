@@ -44,7 +44,7 @@ export default function Footer() {
           <div className="flex flex-col gap-2 text-sm">
             <a href={LINKS.discord} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">Discord</a>
             <a href={LINKS.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">Telegram</a>
-            <a href="mailto:contact@trestle.website" className="hover:text-emerald-400 transition-colors">contact@trestle.website</a>
+            <a href="mailto:contact@trestle.website" className="hover:text-emerald-400 transition-colors">✉️ Contact</a>
             <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">GitHub</a>
           </div>
         </div>

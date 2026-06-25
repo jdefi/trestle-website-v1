@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LINKS } from "@/config/contracts";
-import QRCode from "@/components/QRCode";
+import QRIcon from "@/components/QRIcon";
+
 
 export default function Hero() {
   return (
@@ -12,7 +13,7 @@ export default function Hero() {
       <div className="relative max-w-7xl mx-auto px-6 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-600 text-sm rounded-full mb-6">
           <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          Live on Polygon Amoy Testnet
+          The Marketplace &mdash; Live on Polygon Amoy Testnet
         </div>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 max-w-3xl mx-auto leading-tight mb-6">
@@ -56,15 +57,8 @@ export default function Hero() {
           </Link>
         </div>
 
-        {/* QR code on desktop */}
-        <div className="hidden md:block mt-10">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 p-4 inline-block">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">📱</span>
-              <span className="text-xs text-gray-500 font-medium">Scan to open on mobile</span>
-            </div>
-            <QRCode value="https://trestle.website" size={150} />
-          </div>
+        <div className="hidden md:flex justify-center mt-10">
+          <QRIcon value="https://trestle.website" size={75} />
         </div>
 
         <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-5 max-w-3xl mx-auto">

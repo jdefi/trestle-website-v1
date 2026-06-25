@@ -3,7 +3,7 @@ import Link from "next/link";
 const features = [
   {
     title: "Zero-Friction Onboarding",
-    desc: "Join via Telegram or Gmail. Account Abstraction (ERC-4337) removes seed phrases forever.",
+    desc: "Join via Telegram or Gmail — no seed phrases needed.",
     icon: "⚡",
     color: "emerald",
   },
