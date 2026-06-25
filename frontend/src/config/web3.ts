@@ -1,0 +1,56 @@
+import { http } from "viem";
+import { fallback } from "viem";
+import { polygon } from "viem/chains";
+import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
+import { createAppKit } from "@reown/appkit/react";
+
+export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
+
+const TARGET_NETWORK_ID = "eip155:137";
+
+if (typeof window !== "undefined") {
+  const stored = localStorage.getItem("@appkit/active_caip_network_id");
+  if (stored && stored !== TARGET_NETWORK_ID) {
+    localStorage.removeItem("@appkit/active_caip_network_id");
+  }
+}
+
+const polygonTransports = [
+  http("https://polygon.llamarpc.com", { retryCount: 3, retryDelay: 1000 }),
+  http("https://polygon-rpc.com", { retryCount: 3, retryDelay: 1000 }),
+];
+
+const wagmiAdapter = new WagmiAdapter({
+  projectId,
+  networks: [polygon],
+  transports: {
+    [polygon.id]: fallback(polygonTransports, { rank: true }),
+  },
+  ssr: true,
+});
+
+export const config = wagmiAdapter.wagmiConfig;
+
+createAppKit({
+  adapters: [wagmiAdapter],
+  projectId,
+  networks: [polygon],
+  defaultNetwork: polygon,
+  metadata: {
+    name: "Trestle DeFi",
+    description: "Trestle DeFi — Stake, Earn, and Own",
+    url: "https://trestle.website",
+    icons: ["/favicon.ico"],
+  },
+  features: {
+    email: true,
+    socials: ["google", "github", "discord"],
+  },
+  themeMode: "light",
+  themeVariables: {
+    "--w3m-color-mix": "#059669",
+    "--w3m-color-mix-strength": 20,
+  },
+});
+
+export { polygon };

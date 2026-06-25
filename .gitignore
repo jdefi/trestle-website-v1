@@ -1,10 +1,6 @@
-# Next.js
 node_modules/
 .env
-.env.*
-.next/
-out/
+.env.local
 *.log
 .DS_Store
-.turbo/
-.vercel/
+.next/

@@ -1,0 +1,21 @@
+{
+  "name": "Trestle Protocol",
+  "short_name": "Trestle",
+  "description": "Decentralized Marketplace for Digital Assets, Freelancers & RWA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#059669",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%23059669'/><path d='M52 108h28l-20 56 20 56H52l20-56-20-56z' fill='white' opacity='.95'/><path d='M100 60h28l-20 140 20 40h-28l-20-80 20-140z' fill='white' opacity='.85'/><path d='M148 76h28l-20 96 20 96h-28l-20-96 20-96z' fill='white' opacity='.75'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='72' fill='%23059669'/><path d='M144 288h72l-48 128 48 128H144l48-128-48-128z' fill='white' opacity='.95'/><path d='M260 160h72l-48 320 48 80h-72l-48-80 48-320z' fill='white' opacity='.85'/><path d='M376 192h72l-48 256 48 256h-72l-48-256 48-256z' fill='white' opacity='.75'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
