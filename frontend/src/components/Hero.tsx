@@ -39,14 +39,14 @@ export default function Hero() {
             Launch dApp
           </Link>
           <a
-            href={LINKS.telegramApp}
+            href={LINKS.whitepaper}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 sm:flex-none px-6 py-3 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-xl
                       hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-300 transform hover:-translate-y-1
                       shadow-sm hover:shadow"
           >
-            💬 Open Telegram
+            Whitepaper
           </a>
           <Link
             href="#features"

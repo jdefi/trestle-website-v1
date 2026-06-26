@@ -36,6 +36,7 @@ const features = [
     desc: "Governor Vault rewards up to 2x for diamond hands. 1mo = 1x, 6mo = 1.5x, 1yr = 2x.",
     icon: "💎",
     color: "emerald",
+    tag: "Coming Soon",
   },
 ];
 
@@ -69,6 +70,11 @@ export default function Features() {
               </div>
               <h3 className="mb-3 text-xl font-semibold text-gray-900 group-hover:text-emerald-600 transition-colors">
                 {f.title}
+                {f.tag && (
+                  <span className="ml-2 inline-block text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full align-middle">
+                    {f.tag}
+                  </span>
+                )}
               </h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 {f.desc}

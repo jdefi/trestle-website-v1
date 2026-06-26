@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LINKS } from "@/config/contracts";
 
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: "Trestle dApp | Stake, Mine & Vault",
 };

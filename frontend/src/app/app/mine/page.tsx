@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAccount, useReadContract, useReadContracts } from "wagmi";
+import { isAddress } from "viem";
 import { useContracts } from "@/hooks/useContracts";
-import { CONTRACTS } from "@/config/contracts";
+import { CONTRACTS, DEFAULT_REFERRER } from "@/config/contracts";
 
 const ERC20_ABI = [
   { inputs: [{ name: "account", type: "address" }], name: "balanceOf", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
@@ -49,6 +50,16 @@ export default function MinePage() {
   const [busy, setBusy] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [duration, setDuration] = useState(DURATIONS[0]);
+  const [referrer, setReferrer] = useState("");
+
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    if (ref && isAddress(ref)) {
+      setReferrer(ref);
+    } else {
+      setReferrer(DEFAULT_REFERRER);
+    }
+  }, []);
   const [copiedAddr, setCopiedAddr] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<{ type: string; index: number } | null>(null);
 
@@ -148,7 +159,7 @@ export default function MinePage() {
     if (!amount || busy) return;
     setBusy(true);
     try {
-      await stakeLP(parsedAmt.toString(), duration.lockPeriod);
+      await stakeLP(parsedAmt.toString(), duration.lockPeriod, referrer || DEFAULT_REFERRER);
       setAmount("");
       setModalOpen(false);
     } catch (e: any) {
@@ -296,7 +307,22 @@ export default function MinePage() {
             </div>
 
             <div className="space-y-1 text-sm">
-              <p className="text-gray-700 font-medium">Step 2: Enter LP amount</p>
+              <p className="text-gray-700 font-medium">Step 2: Referrer (optional)</p>
+              <input
+                type="text"
+                placeholder="0x... or leave empty"
+                value={referrer}
+                onChange={e => setReferrer(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg p-2.5 text-sm font-mono"
+              />
+              {referrer && !isAddress(referrer) && (
+                <p className="text-[11px] text-red-500">Invalid address</p>
+              )}
+              <p className="text-[10px] text-gray-400">Auto-filled from referral link. Default: {DEFAULT_REFERRER.slice(0, 8)}...{DEFAULT_REFERRER.slice(-4)}</p>
+            </div>
+
+            <div className="space-y-1 text-sm">
+              <p className="text-gray-700 font-medium">Step 3: Enter LP amount</p>
               <input
                 type="number"
                 placeholder="LP token amount"

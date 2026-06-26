@@ -3,27 +3,52 @@ const phases = [
     phase: "Phase 1",
     title: "Foundation",
     date: "Q1-Q3 2025",
-    items: ["Telegram Mini-App with social login", "hNOBT & BroilerPlus live on Polygon", "Airdrop & referral programs"],
+    items: [
+      { text: "Telegram Mini-App with social login", status: "completed" as const },
+      { text: "hNOBT & BroilerPlus live on Polygon", status: "completed" as const },
+      { text: "Airdrop & referral programs", status: "completed" as const },
+    ],
   },
   {
     phase: "Phase 2",
     title: "Marketplace & RWA",
     date: "Q3 2025 - Q1/Q2 2026",
-    items: ["Decentralized marketplace live", "Fractional RWA tokenization", "Chainlink oracle integration", "Multi-chain expansion"],
+    items: [
+      { text: "Decentralized marketplace live", status: "deploying" as const },
+      { text: "Fractional RWA tokenization", status: "pending" as const },
+      { text: "Chainlink oracle integration", status: "pending" as const },
+      { text: "Multi-chain expansion", status: "pending" as const },
+    ],
   },
   {
     phase: "Phase 3",
     title: "The Flywheel",
     date: "Q2 2026",
-    items: ["Stake hNOBT, mine BRT via LP staking", "BroilerPlus LP mining program", "Governor Vaults (Tier 3)", "Kleros escrow integration"],
+    items: [
+      { text: "Stake hNOBT, mine BRT via LP staking", status: "completed" as const },
+      { text: "BroilerPlus LP mining program", status: "completed" as const },
+      { text: "Governor Vaults (Tier 3)", status: "deploying" as const },
+      { text: "Kleros escrow integration", status: "pending" as const },
+    ],
   },
   {
     phase: "Phase 4",
     title: "Scaling",
     date: "2027+",
-    items: ["Cross-chain bridges", "Institutional RWA partnerships", "AI-powered freelancer tools", "Self-sustaining economic flywheel"],
+    items: [
+      { text: "Cross-chain bridges", status: "pending" as const },
+      { text: "Institutional RWA partnerships", status: "pending" as const },
+      { text: "AI-powered freelancer tools", status: "pending" as const },
+      { text: "Self-sustaining economic flywheel", status: "pending" as const },
+    ],
   },
 ];
+
+const statusColors: Record<string, string> = {
+  completed: "bg-emerald-500",
+  deploying: "bg-amber-400",
+  pending: "bg-gray-300",
+};
 
 export default function Roadmap() {
   return (
@@ -50,9 +75,14 @@ export default function Roadmap() {
                 <p className="mt-2 text-xs text-gray-400 font-medium">{p.date}</p>
                 <ul className="mt-6 space-y-3">
                   {p.items.map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-gray-600">
-                      <div className="flex-shrink-0 w-3 h-3 bg-emerald-500 rounded-full mt-0.5" />
-                      <span>{item}</span>
+                    <li key={item.text} className="flex items-start gap-3 text-sm text-gray-600">
+                      <div className={"flex-shrink-0 w-3 h-3 rounded-full mt-0.5 " + statusColors[item.status]} />
+                      <span>
+                        {item.text}
+                        {item.status === "deploying" && (
+                          <span className="ml-2 inline-block text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Coming Soon</span>
+                        )}
+                      </span>
                     </li>
                   ))}
                 </ul>

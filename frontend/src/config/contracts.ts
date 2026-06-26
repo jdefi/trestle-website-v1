@@ -1,4 +1,6 @@
 export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+export const SITE_URL = "https://trestle.website";
+export const DEFAULT_REFERRER = "0x0CdC070E41127A9C3a4E8C95A813B5885d125112";
 
 export const CONTRACTS = {
   mainnet: {
@@ -22,4 +24,5 @@ export const LINKS = {
   github: "https://github.com/Trestle-DeFi",
   docs: "https://docs.trestle.website",
   telegramApp: "https://t.me/trestlehub_bot",
+  whitepaper: "https://trestle-defi.github.io/trestle-whitepaper",
 };

@@ -76,8 +76,8 @@ export function useContracts() {
       writeContractAsync({ abi: STAKE_ABI, address: stakeAddr, functionName: "withdraw", args: [BigInt(index)] } as any),
     earlyUnstakeStake: (index: number) =>
       writeContractAsync({ abi: STAKE_ABI, address: stakeAddr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
-    stakeLP: (amt: string, lockPeriod: number) =>
-      writeContractAsync({ abi: MINE_ABI, address: mineAddr, functionName: "stake", args: [BigInt(amt), lockPeriod, "0x0000000000000000000000000000000000000000"] } as any),
+    stakeLP: (amt: string, lockPeriod: number, referrer?: string) =>
+      writeContractAsync({ abi: MINE_ABI, address: mineAddr, functionName: "stake", args: [BigInt(amt), lockPeriod, referrer || "0x0000000000000000000000000000000000000000"] } as any),
     approveLP: (amt: string) =>
       writeContractAsync({ abi: ERC20_ABI, address: brtLP, functionName: "approve", args: [mineAddr, BigInt(amt)] } as any),
     withdrawMine: (index: number) =>

@@ -86,7 +86,10 @@ export default function Flywheel() {
             <p>Stake hNOBT to mine BroilerPlus. Provide BRT LP liquidity for higher yields.</p>
           </div>
           <div className="p-6 bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:border-emerald-100 transition-all duration-300">
-            <p className="mb-3 font-semibold text-gray-900 text-xl">3. Govern</p>
+            <p className="mb-3 font-semibold text-gray-900 text-xl">
+              3. Govern
+              <span className="ml-2 inline-block text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full align-middle">Coming Soon</span>
+            </p>
             <p>Deposit BRT LP into Governor Vault to earn governance tokens + fee shares.</p>
           </div>
         </div>

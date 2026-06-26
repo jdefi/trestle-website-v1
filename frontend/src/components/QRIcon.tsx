@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import QRCode from "@/components/QRCode";
+import { SITE_URL } from "@/config/contracts";
 
-export default function QRIcon({ value = "https://trestle.website", size = 90 }) {
+export default function QRIcon({ value = SITE_URL, size = 90 }) {
   const [open, setOpen] = useState(false);
 
   return (
