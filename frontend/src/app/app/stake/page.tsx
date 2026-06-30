@@ -9,6 +9,7 @@ const READ_ABI = [
   { inputs: [{ name: "_account", type: "address" }], name: "userWeightedStake", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [], name: "totalWeightedStake", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [], name: "rewardRate", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [{ name: "_account", type: "address" }], name: "earnedNet", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
 ] as const;
 
 const STAKE_READ_ABI = [
@@ -37,7 +38,7 @@ const multDisplay = (m: bigint) => (Number(m) / 10000).toFixed(m === 10000n ? 0 
 
 export default function StakePage() {
   const { address, isConnected } = useAccount();
-  const { hNOBTBalance, hNOBTAllowance, stakeHnobt, approveHnobt, withdrawStake, earlyUnstakeStake } = useContracts();
+  const { hNOBTBalance, hNOBTAllowance, stakeHnobt, approveHnobt, withdrawStake, earlyUnstakeStake, claimReward } = useContracts();
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -65,6 +66,11 @@ export default function StakePage() {
   const { data: totalStaked } = useReadContract({
     abi: READ_ABI, address: stakeAddr, functionName: "totalWeightedStake",
     query: { refetchInterval: 3_600_000 },
+  });
+  const { data: pendingBrt } = useReadContract({
+    abi: READ_ABI, address: stakeAddr, functionName: "earnedNet",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address, refetchInterval: 10_000 },
   });
 
   const hNOBT = CONTRACTS.mainnet.hNOBT;
@@ -151,6 +157,16 @@ export default function StakePage() {
     setBusyAction(null);
   };
 
+  const handleClaimReward = async () => {
+    setBusy(true);
+    try {
+      await claimReward();
+    } catch (e: any) {
+      alert(e.message);
+    }
+    setBusy(false);
+  };
+
   return (
     <div className="max-w-lg mx-auto space-y-4">
       <div className="bg-white rounded-xl border border-emerald-200 p-5 space-y-4">
@@ -180,6 +196,11 @@ export default function StakePage() {
         {stakes.length > 0 && (
           <div className="space-y-2">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Your stakes</p>
+            {Number(pendingBrt || 0) > 0 && (
+              <button onClick={handleClaimReward} disabled={busy}
+                className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg disabled:opacity-40 transition text-xs"
+              >{busy ? "Processing..." : `Claim ${(Number(pendingBrt || 0) / 1e9).toFixed(6)} BRT Rewards`}</button>
+            )}
             {stakes.map(s => {
               const unlocked = now >= Number(s.lockEndTime);
               const lockdownPassed = now >= Number(s.stakeTime) + 86400;

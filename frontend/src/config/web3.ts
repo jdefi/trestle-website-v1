@@ -6,15 +6,6 @@ import { createAppKit } from "@reown/appkit/react";
 
 export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
 
-const TARGET_NETWORK_ID = "eip155:137";
-
-if (typeof window !== "undefined") {
-  const stored = localStorage.getItem("@appkit/active_caip_network_id");
-  if (stored && stored !== TARGET_NETWORK_ID) {
-    localStorage.removeItem("@appkit/active_caip_network_id");
-  }
-}
-
 const polygonTransports = [
   http("https://polygon.llamarpc.com", { retryCount: 3, retryDelay: 1000 }),
   http("https://polygon-rpc.com", { retryCount: 3, retryDelay: 1000 }),
@@ -42,6 +33,7 @@ createAppKit({
     url: "https://trestle.website",
     icons: ["/favicon.ico"],
   },
+  allowUnsupportedChain: true,
   features: {
     email: true,
     socials: ["google", "github", "discord"],

@@ -18,6 +18,8 @@ const STAKE_ABI = [
   { inputs: [], name: "rewardRate", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [{ name: "_index", type: "uint256" }], name: "withdraw", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [{ name: "_index", type: "uint256" }], name: "earlyUnstake", outputs: [], type: "function", stateMutability: "nonpayable" },
+  { inputs: [], name: "claimReward", outputs: [], type: "function", stateMutability: "nonpayable" },
+  { inputs: [{ name: "_account", type: "address" }], name: "earnedNet", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
 ] as const;
 
 const MINE_ABI = [
@@ -27,6 +29,8 @@ const MINE_ABI = [
   { inputs: [], name: "briRewardRate", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [{ name: "_stakeIndex", type: "uint256" }], name: "withdraw", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [{ name: "_stakeIndex", type: "uint256" }], name: "earlyUnstake", outputs: [], type: "function", stateMutability: "nonpayable" },
+  { inputs: [], name: "claimRewards", outputs: [], type: "function", stateMutability: "nonpayable" },
+  { inputs: [{ name: "_account", type: "address" }], name: "earnedBriNet", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
 ] as const;
 
 const MARKETPLACE_ABI = [
@@ -76,6 +80,8 @@ export function useContracts() {
       writeContractAsync({ abi: STAKE_ABI, address: stakeAddr, functionName: "withdraw", args: [BigInt(index)] } as any),
     earlyUnstakeStake: (index: number) =>
       writeContractAsync({ abi: STAKE_ABI, address: stakeAddr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
+    claimReward: () =>
+      writeContractAsync({ abi: STAKE_ABI, address: stakeAddr, functionName: "claimReward", args: [] } as any),
     stakeLP: (amt: string, lockPeriod: number, referrer?: string) =>
       writeContractAsync({ abi: MINE_ABI, address: mineAddr, functionName: "stake", args: [BigInt(amt), lockPeriod, referrer || "0x0000000000000000000000000000000000000000"] } as any),
     approveLP: (amt: string) =>
@@ -84,6 +90,8 @@ export function useContracts() {
       writeContractAsync({ abi: MINE_ABI, address: mineAddr, functionName: "withdraw", args: [BigInt(index)] } as any),
     earlyUnstakeMine: (index: number) =>
       writeContractAsync({ abi: MINE_ABI, address: mineAddr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
+    claimRewards: () =>
+      writeContractAsync({ abi: MINE_ABI, address: mineAddr, functionName: "claimRewards", args: [] } as any),
     depositVault: (amt: string) =>
       writeContractAsync({ abi: STAKE_ABI, address: vaultAddr, functionName: "stake", args: [BigInt(amt), 1] } as any),
     buyListing: (id: number, value: string) =>

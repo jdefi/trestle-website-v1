@@ -1,21 +1,32 @@
-# trestle.website Frontend
+# trestle.website
 
-Next.js frontend for the Trestle Protocol landing page. Built with thirdweb SDK and Tailwind CSS.
+Main public-facing landing page for Trestle DeFi. Built with Next.js and wagmi + Reown AppKit.
+**Disclaimer:** Not affiliated with Trestle Protocol (Celestia Bridge).
 
-## Pages
+## Sections
 
-- `/` — Landing page
-- `/app` — Dashboard
-- `/app/stake/tier1` — Stake Tier 1
-- `/app/stake/tier2` — Stake Tier 2
-- `/app/stake/tier3` — Stake Tier 3
-- `/app/marketplace` — Digital goods marketplace
-- `/app/withdraw` — Withdraw interface
+- **Marketing:** Hero, Features, Tokens, Roadmap, CTA
+- **Dashboard:** Stake, Mine, Vault, Marketplace, Wallet
 
-## Commands
+## Tech Stack
+
+- Next.js
+- wagmi + Reown AppKit (wallet connection, contract interactions)
+- Tailwind CSS
+
+## Getting Started
 
 ```bash
-npm run dev    # http://localhost:3000
+npm install
+npm run dev     # http://localhost:3000
 npm run build
 npm start
 ```
+
+## 📬 Contact
+- **Website**: [https://trestle.website](https://trestle.website)
+- **GitHub**: [Trestle DeFi](https://github.com/Trestle-DeFi)
+- **Discord**: [Trestle DeFi](https://discord.gg/4dCCvnJYGT)
+- **Telegram**: [trestleDeFi](https://t.me/trestleDeFi)
+- **Telegram App**: [trestlehub_bot](https://t.me/trestlehub_bot)
+- **Email**: contact@trestle.website

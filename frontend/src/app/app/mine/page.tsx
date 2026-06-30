@@ -16,6 +16,7 @@ const READ_ABI = [
   { inputs: [], name: "briRewardRate", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [], name: "xgovPointRate", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [{ name: "_account", type: "address" }], name: "earnedXgovPoints", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [{ name: "_account", type: "address" }], name: "earnedBriNet", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
 ] as const;
 
 const STAKE_READ_ABI = [
@@ -45,7 +46,7 @@ const multDisplay = (m: bigint) => (Number(m) / 10000).toFixed(1) + "x";
 
 export default function MinePage() {
   const { address, isConnected } = useAccount();
-  const { brtBalance, lpAllowance, stakeLP, approveLP, withdrawMine, earlyUnstakeMine } = useContracts();
+  const { brtBalance, lpAllowance, stakeLP, approveLP, withdrawMine, earlyUnstakeMine, claimRewards } = useContracts();
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -93,6 +94,11 @@ export default function MinePage() {
     abi: READ_ABI, address: mineAddr, functionName: "earnedXgovPoints",
     args: address ? [address] : undefined,
     query: { enabled: !!address, refetchInterval: 3_600_000 },
+  });
+  const { data: earnedBrtNet } = useReadContract({
+    abi: READ_ABI, address: mineAddr, functionName: "earnedBriNet",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address, refetchInterval: 10_000 },
   });
   const { data: lpBalance } = useReadContract({
     abi: ERC20_ABI, address: lpAddr, functionName: "balanceOf",
@@ -188,6 +194,16 @@ export default function MinePage() {
     setBusyAction(null);
   };
 
+  const handleClaimRewards = async () => {
+    setBusy(true);
+    try {
+      await claimRewards();
+    } catch (e: any) {
+      alert(e.message);
+    }
+    setBusy(false);
+  };
+
   return (
     <div className="max-w-lg mx-auto space-y-4">
       <div className="bg-white rounded-xl border border-blue-200 p-5 space-y-4">
@@ -221,6 +237,11 @@ export default function MinePage() {
         {stakes.length > 0 && (
           <div className="space-y-2">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Your stakes</p>
+            {(Number(earnedBrtNet || 0) > 0 || Number(earnedXgov || 0) > 0) && (
+              <button onClick={handleClaimRewards} disabled={busy}
+                className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg disabled:opacity-40 transition text-xs"
+              >{busy ? "Processing..." : `Claim ${(Number(earnedBrtNet || 0) / 1e9).toFixed(6)} BRT + ${(Number(earnedXgov || 0) / 1e18).toFixed(2)} xGov`}</button>
+            )}
             {stakes.map(s => {
               const unlocked = now >= Number(s.lockEndTime);
               const lockdownPassed = now >= Number(s.stakeTime) + 86400;
