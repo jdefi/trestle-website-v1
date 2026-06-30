@@ -273,21 +273,6 @@ describe("BroilerPlusStaking", function () {
       ).to.be.revertedWithCustomError(staking, "OwnableUnauthorizedAccount");
     });
 
-    it("should allow owner emergency withdraw", async function () {
-      await staking.connect(user1).stake(ethers.parseEther("100"), 1, ethers.ZeroAddress);
-      const balBefore = await lpToken.balanceOf(user1.address);
-      await staking.connect(owner).emergencyWithdraw(user1.address, 0);
-      const balAfter = await lpToken.balanceOf(user1.address);
-      expect(balAfter - balBefore).to.equal(ethers.parseEther("100"));
-    });
-
-    it("should reject emergency withdraw from non-owner", async function () {
-      await staking.connect(user1).stake(ethers.parseEther("100"), 1, ethers.ZeroAddress);
-      await expect(
-        staking.connect(user1).emergencyWithdraw(user1.address, 0)
-      ).to.be.revertedWithCustomError(staking, "OwnableUnauthorizedAccount");
-    });
-
     it("should allow owner to recover ERC20", async function () {
       await briToken.connect(owner).mint(await staking.getAddress(), ethers.parseEther("100"));
       const balBefore = await briToken.balanceOf(owner.address);
@@ -474,13 +459,6 @@ describe("BroilerPlusStaking", function () {
   });
 
   describe("Owner-only edge cases", function () {
-    it("should revert emergencyWithdraw with invalid index", async function () {
-      await staking.connect(user1).stake(ethers.parseEther("100"), 1, ethers.ZeroAddress);
-      await expect(
-        staking.connect(owner).emergencyWithdraw(user1.address, 99)
-      ).to.be.revertedWith("Invalid index targeted");
-    });
-
     it("should revert recoverERC20 from non-owner", async function () {
       await expect(
         staking.connect(user1).recoverERC20(await lpToken.getAddress(), 1)
@@ -599,24 +577,12 @@ describe("BroilerPlusStaking", function () {
     });
   });
 
-  describe("Emergency withdraw does not send reward tokens", function () {
-    it("should return only staking token, not BRI or gov points", async function () {
-      await staking.connect(user1).stake(ethers.parseEther("100"), 1, ethers.ZeroAddress);
-      await ethers.provider.send("evm_increaseTime", [7 * DAY]);
-      await ethers.provider.send("evm_mine");
-      await staking.connect(owner).emergencyWithdraw(user1.address, 0);
-      expect(await briToken.balanceOf(user1.address)).to.equal(0);
-      expect(await staking.accumulatedGovPoints(user1.address)).to.equal(0);
-    });
-  });
-
   describe("recoverERC20 behavior with staking token", function () {
-    it("should allow owner to recover staking token (no guard in contract)", async function () {
-      // Fund the contract with staking tokens first
+    it("should reject recovering staking token (now guarded)", async function () {
       await lpToken.connect(owner).mint(await staking.getAddress(), ethers.parseEther("10"));
-      const before = await lpToken.balanceOf(owner.address);
-      await staking.connect(owner).recoverERC20(await lpToken.getAddress(), ethers.parseEther("1"));
-      expect(await lpToken.balanceOf(owner.address)).to.equal(before + ethers.parseEther("1"));
+      await expect(
+        staking.connect(owner).recoverERC20(await lpToken.getAddress(), ethers.parseEther("1"))
+      ).to.be.revertedWith("Cannot recover staking token");
     });
   });
 

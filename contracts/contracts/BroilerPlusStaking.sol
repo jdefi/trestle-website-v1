@@ -52,6 +52,10 @@ contract BroilerPlusStaking is Ownable, ReentrancyGuard {
     uint256 public totalRawStaked;
     uint256 public totalWeightedSupply;
     uint256 public referralPercentage = 500;
+    uint256 public constant MAX_REFERRAL_BPS = 2000; // max 20%
+
+    uint256 public maxBriRewardRate;
+    uint256 public maxXgovPointRate;
 
     mapping(address => UserInfo) public userInfo;
 
@@ -66,7 +70,7 @@ contract BroilerPlusStaking is Ownable, ReentrancyGuard {
     event Staked(address indexed user, uint256 index, uint256 amount, uint256 weightedAmount);
     event Withdrawn(address indexed user, uint256 index, uint256 amount);
     event EarlyUnstaked(address indexed user, uint256 index, uint256 amount, uint256 rewardPenalty);
-    event EmergencyWithdrawn(address indexed user, uint256 index, uint256 amount);
+
     event RewardPaid(address indexed user, uint256 briPaid, uint256 govPointsMinted);
 
     constructor(address _stakingToken, address _briToken) Ownable(msg.sender) {
@@ -273,31 +277,32 @@ contract BroilerPlusStaking is Ownable, ReentrancyGuard {
         emit RewardPaid(msg.sender, _grossUp(briTotal), govTotal);
     }
 
+    function setReferralPercentage(uint256 _bps) external onlyOwner {
+        require(_bps <= MAX_REFERRAL_BPS, "Referral too high");
+        referralPercentage = _bps;
+    }
+
+    function setMaxRates(uint256 _maxBri, uint256 _maxXgov) external onlyOwner {
+        maxBriRewardRate = _maxBri;
+        maxXgovPointRate = _maxXgov;
+    }
+
     function setRewardRate(uint256 _briRate, uint256 _pointsRate, uint256 _duration) external onlyOwner updateReward(address(0)) {
+        require(_duration > 0, "Duration must be > 0");
+        require(maxBriRewardRate == 0 || _briRate <= maxBriRewardRate, "BRI rate exceeds max");
+        require(maxXgovPointRate == 0 || _pointsRate <= maxXgovPointRate, "xGov rate exceeds max");
         briRewardRate = _briRate;
         xgovPointRate = _pointsRate;
         rewardFinishTime = block.timestamp + _duration;
         lastUpdateTime = block.timestamp;
     }
 
-    function emergencyWithdraw(address _user, uint256 _stakeIndex) external onlyOwner {
-        UserInfo storage user = userInfo[_user];
-        require(_stakeIndex < user.stakes.length, "Invalid index targeted");
-        StakeSlot storage slot = user.stakes[_stakeIndex];
-        require(!slot.withdrawn, "Funds previously extracted");
-
-        slot.withdrawn = true;
-        totalRawStaked -= slot.amount;
-        totalWeightedSupply -= slot.weightedAmount;
-
-        if (slot.amount > 0) {
-            stakingToken.safeTransfer(_user, slot.amount);
-        }
-
-        emit EmergencyWithdrawn(_user, _stakeIndex, slot.amount);
+    function fundRewards(uint256 _amount) external {
+        briToken.safeTransferFrom(msg.sender, address(this), _amount);
     }
 
     function recoverERC20(address _token, uint256 _amount) external onlyOwner {
+        require(_token != address(stakingToken), "Cannot recover staking token");
         IERC20(_token).safeTransfer(owner(), _amount);
     }
 }

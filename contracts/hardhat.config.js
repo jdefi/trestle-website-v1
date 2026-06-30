@@ -19,8 +19,7 @@ module.exports = {
         process.env.DEPLOYER_PRIVATE_KEY && process.env.DEPLOYER_PRIVATE_KEY.length > 0
           ? [process.env.DEPLOYER_PRIVATE_KEY]
           : [],
-      gasPrice: 400e9, // 400 gwei — adjust if stuck (check https://polygonscan.com/gastracker)
-      timeout: 120000, // 2 minutes for slow blocks
+      timeout: 120000,
     },
   },
 

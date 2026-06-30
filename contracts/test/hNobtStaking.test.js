@@ -210,21 +210,6 @@ describe("hNobtStaking", function () {
       ).to.be.revertedWithCustomError(staking, "OwnableUnauthorizedAccount");
     });
 
-    it("should allow owner emergency withdraw", async function () {
-      await staking.connect(user1).stake(ethers.parseEther("100"), 1);
-      const balBefore = await stakingToken.balanceOf(user1.address);
-      await staking.connect(owner).emergencyWithdraw(user1.address, 0);
-      const balAfter = await stakingToken.balanceOf(user1.address);
-      expect(balAfter - balBefore).to.equal(ethers.parseEther("100"));
-    });
-
-    it("should reject emergency withdraw from non-owner", async function () {
-      await staking.connect(user1).stake(ethers.parseEther("100"), 1);
-      await expect(
-        staking.connect(user1).emergencyWithdraw(user1.address, 0)
-      ).to.be.revertedWithCustomError(staking, "OwnableUnauthorizedAccount");
-    });
-
     it("should allow anyone to fund rewards", async function () {
       await rewardToken.connect(owner).mint(user2.address, ethers.parseEther("500"));
       await rewardToken.connect(user2).approve(await staking.getAddress(), ethers.parseEther("500"));
@@ -489,34 +474,6 @@ describe("hNobtStaking", function () {
     });
   });
 
-  describe("emergencyWithdraw — edge cases", function () {
-    it("should revert emergencyWithdraw with invalid index", async function () {
-      await staking.connect(user1).stake(ethers.parseEther("100"), 1);
-      await expect(
-        staking.connect(owner).emergencyWithdraw(user1.address, 99)
-      ).to.be.revertedWith("Invalid index");
-    });
-
-    it("should revert emergencyWithdraw from non-owner", async function () {
-      await staking.connect(user1).stake(ethers.parseEther("100"), 1);
-      await expect(
-        staking.connect(user1).emergencyWithdraw(user1.address, 0)
-      ).to.be.revertedWithCustomError(staking, "OwnableUnauthorizedAccount");
-    });
-
-    it("should not transfer reward tokens on emergencyWithdraw", async function () {
-      await rewardToken.connect(owner).mint(await staking.getAddress(), ethers.parseEther("100"));
-      await staking.connect(user1).stake(ethers.parseEther("100"), 1);
-      await ethers.provider.send("evm_increaseTime", [7 * DAY]);
-      await ethers.provider.send("evm_mine");
-      const balBefore = await rewardToken.balanceOf(await staking.getAddress());
-      await staking.connect(owner).emergencyWithdraw(user1.address, 0);
-      const balAfter = await rewardToken.balanceOf(await staking.getAddress());
-      // Reward tokens remain in contract
-      expect(balAfter).to.equal(balBefore);
-    });
-  });
-
   describe("recoverERC20", function () {
     it("should revert recoverERC20 from non-owner", async function () {
       await expect(
@@ -524,12 +481,18 @@ describe("hNobtStaking", function () {
       ).to.be.revertedWithCustomError(staking, "OwnableUnauthorizedAccount");
     });
 
-    it("should transfer tokens to owner", async function () {
-      // Fund the contract with staking tokens first
+    it("should transfer reward tokens to owner", async function () {
+      await rewardToken.connect(owner).mint(await staking.getAddress(), ethers.parseEther("10"));
+      const balBefore = await rewardToken.balanceOf(owner.address);
+      await staking.connect(owner).recoverERC20(await rewardToken.getAddress(), ethers.parseEther("1"));
+      expect(await rewardToken.balanceOf(owner.address)).to.equal(balBefore + ethers.parseEther("1"));
+    });
+
+    it("should reject recovering staking token", async function () {
       await stakingToken.connect(owner).mint(await staking.getAddress(), ethers.parseEther("10"));
-      const balBefore = await stakingToken.balanceOf(owner.address);
-      await staking.connect(owner).recoverERC20(await stakingToken.getAddress(), ethers.parseEther("1"));
-      expect(await stakingToken.balanceOf(owner.address)).to.equal(balBefore + ethers.parseEther("1"));
+      await expect(
+        staking.connect(owner).recoverERC20(await stakingToken.getAddress(), ethers.parseEther("1"))
+      ).to.be.revertedWith("Cannot recover staking token");
     });
   });
 

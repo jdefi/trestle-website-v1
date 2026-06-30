@@ -1,118 +1,32 @@
-# Trestle DeFi Monorepo
+# trestle.website
 
-![Trestle Logo](https://via.placeholder.com/150) <!-- Replace with your logo -->
+Main public-facing landing page for Trestle DeFi. Built with Next.js and wagmi + Reown AppKit.
+**Disclaimer:** Not affiliated with Trestle Protocol (Celestia Bridge).
 
-**A decentralized marketplace for digital assets, freelancer services, and real-world assets (RWA).**
+## Sections
 
----
+- **Marketing:** Hero, Features, Tokens, Roadmap, CTA
+- **Dashboard:** Stake, Mine, Vault, Marketplace, Wallet
 
- **Disclaimer:** Not affiliated with Trestle Protocol (Celestia Bridge).
-=======
+## Tech Stack
 
-## 🚀 Getting Started
+- Next.js
+- wagmi + Reown AppKit (wallet connection, contract interactions)
+- Tailwind CSS
 
-### Prerequisites
-- **Node.js** (v18+ recommended).
-- **npm** or **Yarn** (v1.22+).
-- **Git**.
-
----
-
-### Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Trestle-DeFi/trestle.git
-   cd trestle
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-3. **Set up environment variables**:
-   - Copy `.env.example` to `.env` in each project (e.g., `front-end/.env.local`).
-   - Fill in the required values (e.g., API keys, RPC URLs).
-
----
-
-## 🛠 Development
-
-### Run Frontend
-```bash
-cd front-end
-npm run dev
-# or
-yarn dev
-```
-
----
-
-## 🌐 Deployment
-
-### `trestle.website` (Vercel)
-1. Push code to the `main` branch.
-2. Vercel will automatically deploy.
-3. Configure environment variables in Vercel.
-
----
-
-## 📁 Directory Structure
-
-```
-trestle-website-v1/
-├── front-end/                # Next.js frontend
-│   ├── src/
-│   │   ├── app/              # App router (Next.js 13+)
-│   │   ├── components/       # React components
-│   │   ├── hooks/            # Custom React hooks
-│   │   └── config/           # Configuration files
-│   ├── public/               # Static assets
-│   └── package.json
-└── README.md
-```
-
----
-
-## Pages
-
-- `/` — Landing page
-- `/app` — Dashboard (Portfolio display)
-- `/app/stake` — Stake hNOBT
-- `/app/mine` — Mine LP
-- `/app/vault` — Governor Vault
-- `/app/marketplace` — Digital goods marketplace
-- `/app/withdraw` — Withdraw interface
-
-## Commands
+## Getting Started
 
 ```bash
-npm run dev    # http://localhost:3000
+npm install
+npm run dev     # http://localhost:3000
 npm run build
 npm start
 ```
 
-## Environment Variables
-
-Required environment variables (create `front-end/.env.local`):
-```bash
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_wc_project_id
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_BICONOMY_API_KEY=your_biconomy_key
-NEXT_PUBLIC_BICONOMY_API_URL=https://api.biconomy.io
-```
-
-## Chain Support
-- Polygon Mainnet (chainId: 137)
-- Polygon Amoy Testnet (chainId: 80002)
-
 ## 📬 Contact
 - **Website**: [https://trestle.website](https://trestle.website)
-- **GitHub**: [Trestle Protocol](https://github.com/Trestle-DeFi)
-- **Discord**: [Trestle Protocol](https://discord.gg/4dCCvnJYGT)
-- **Telegram**: [Trestle Pro](https://t.me/TrestleDeFi)
+- **GitHub**: [Trestle DeFi](https://github.com/Trestle-DeFi)
+- **Discord**: [Trestle DeFi](https://discord.gg/4dCCvnJYGT)
+- **Telegram**: [trestleDeFi](https://t.me/trestleDeFi)
+- **Telegram App**: [trestlehub_bot](https://t.me/trestlehub_bot)
 - **Email**: contact@trestle.website
-

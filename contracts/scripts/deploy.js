@@ -5,9 +5,8 @@ const path = require("path");
 
 const dotenv = require("dotenv");
 const ep = dotenv.config({ path: path.join(__dirname, "..", ".env") }).parsed || {};
-const RPC_URL = ep.POLYGON_RPC_URL || process.env.POLYGON_RPC_URL || "https://polygon-mainnet.g.alchemy.com/v2/ygU97uLK7F_1K_4ivkJMM";
+const RPC_URL = ep.POLYGON_RPC_URL || process.env.POLYGON_RPC_URL || "https://polygon-bor-rpc.publicnode.com";
 const PRIVATE_KEY = ep.DEPLOYER_PRIVATE_KEY || process.env.DEPLOYER_PRIVATE_KEY;
-const GAS_PRICE = ethers.parseUnits("500", "gwei");
 
 async function main() {
   if (!PRIVATE_KEY) {
@@ -24,6 +23,9 @@ async function main() {
     console.error(`❌ Wrong network: chain ID ${chainId} (expected 137 = Polygon mainnet)`);
     process.exit(1);
   }
+
+  const feeData = await provider.getFeeData();
+  const GAS_PRICE = feeData.gasPrice ? (feeData.gasPrice * 110n / 100n) : ethers.parseUnits("50", "gwei");
 
   const balance = await provider.getBalance(wallet.address);
   console.log("Network:", network.name, `(${chainId})`);
@@ -46,24 +48,24 @@ async function main() {
     return JSON.parse(fs.readFileSync(p, "utf8"));
   };
 
-  async function deployContract(name, args) {
-    const artifact = artifactPath(name);
-    const factory = new ethers.ContractFactory(artifact.abi, artifact.bytecode, wallet);
-    console.log(`\n[Deploy] ${name}...`);
+  async function sendTx(txReq) {
     const nonce = await provider.getTransactionCount(wallet.address, "pending");
-    const deployTx = await factory.getDeployTransaction(...args);
-    const tx = await wallet.sendTransaction({
-      data: deployTx.data,
-      gasLimit: 3_000_000n,
-      gasPrice: GAS_PRICE,
-      nonce,
-    });
+    const tx = await wallet.sendTransaction({ ...txReq, gasPrice: GAS_PRICE, nonce });
     console.log(`  tx: ${tx.hash} (nonce: ${nonce})`);
     console.log("  waiting for receipt...");
     const receipt = await Promise.race([
       tx.wait(1),
       new Promise((_, rej) => setTimeout(() => rej(new Error("timeout after 90s")), 90_000)),
     ]);
+    return receipt;
+  }
+
+  async function deployContract(name, args) {
+    const artifact = artifactPath(name);
+    const factory = new ethers.ContractFactory(artifact.abi, artifact.bytecode, wallet);
+    console.log(`\n[Deploy] ${name}...`);
+    const deployTx = await factory.getDeployTransaction(...args);
+    const receipt = await sendTx({ data: deployTx.data, gasLimit: 3_000_000n });
     if (!receipt || !receipt.contractAddress) {
       console.error(`  ❌ Deploy failed — no contract address in receipt`);
       console.error(`  Status: ${receipt?.status}`);
@@ -77,31 +79,25 @@ async function main() {
   const broilerAddr = await deployContract("BroilerPlusStaking", [BRT_LP, BRT]);
 
   const DAY = 86400;
-  const rate = ethers.parseEther("1");
+  const rate = ethers.parseUnits("1", 9); // BRT has 9 decimals
 
   console.log("\n[Config] Setting reward rates...");
 
   const hNobtIface = new ethers.Interface(artifactPath("hNobtStaking").abi);
-  let tx = await wallet.sendTransaction({
+  let receipt = await sendTx({
     to: hNobtAddr,
     data: hNobtIface.encodeFunctionData("setRewardRate", [rate, 30 * DAY]),
     gasLimit: 500_000n,
-    gasPrice: GAS_PRICE,
-    nonce: await provider.getTransactionCount(wallet.address, "pending"),
   });
-  let receipt = await tx.wait(1);
-  console.log(`  hNobtStaking rate set (tx: ${tx.hash}, block: ${receipt.blockNumber})`);
+  console.log(`  hNobtStaking rate set (tx: ${receipt.hash}, block: ${receipt.blockNumber})`);
 
   const broilerIface = new ethers.Interface(artifactPath("BroilerPlusStaking").abi);
-  tx = await wallet.sendTransaction({
+  receipt = await sendTx({
     to: broilerAddr,
     data: broilerIface.encodeFunctionData("setRewardRate", [rate, rate, 30 * DAY]),
     gasLimit: 500_000n,
-    gasPrice: GAS_PRICE,
-    nonce: await provider.getTransactionCount(wallet.address, "pending"),
   });
-  receipt = await tx.wait(1);
-  console.log(`  BroilerPlusStaking rates set (tx: ${tx.hash}, block: ${receipt.blockNumber})`);
+  console.log(`  BroilerPlusStaking rates set (tx: ${receipt.hash}, block: ${receipt.blockNumber})`);
 
   console.log("\n[Verify] Running Etherscan verification...");
   if (process.env.ETHERSCAN_API_KEY) {

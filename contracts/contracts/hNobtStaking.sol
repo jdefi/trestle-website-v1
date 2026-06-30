@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /// @title hNobtStaking
-/// @notice Stake hNOBT (Tier 1) to earn BRT rewards.
+/// @notice Stake hNOBT to earn BRT rewards.
 /// @dev BRT (rewardToken) carries a 5% transfer fee. All outgoing
 ///      BRT transfers are grossed up via _grossUp() so the recipient
 ///      receives the full advertised reward amount.
@@ -54,12 +54,13 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
     uint256 public constant BRI_TRANSFER_FEE_BPS = 500; // 5% fee on BRT transfers
     uint256 public constant BRI_FEE_DENOMINATOR = 10000;
 
+    uint256 public maxRewardRate;
+
     event Staked(address indexed user, uint256 index, uint256 amount, uint8 lockPeriod);
     event Withdrawn(address indexed user, uint256 index, uint256 amount);
     event RewardClaimed(address indexed user, uint256 amount);
     event RewardRateUpdated(uint256 rate, uint256 duration);
     event EarlyUnstaked(address indexed user, uint256 index, uint256 amount, uint256 rewardPenalty);
-    event EmergencyWithdrawn(address indexed user, uint256 index, uint256 amount);
 
     constructor(address _stakingToken, address _rewardToken) Ownable(msg.sender) {
         stakingToken = IERC20(_stakingToken);
@@ -216,8 +217,13 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
         emit RewardClaimed(msg.sender, _grossUp(amount));
     }
 
+    function setMaxRewardRate(uint256 _max) external onlyOwner {
+        maxRewardRate = _max;
+    }
+
     function setRewardRate(uint256 _rate, uint256 _duration) external onlyOwner updateReward(address(0)) {
         require(_duration > 0, "Duration must be > 0");
+        require(maxRewardRate == 0 || _rate <= maxRewardRate, "Rate exceeds max");
         rewardRate = _rate;
         rewardFinishTime = block.timestamp + _duration;
         lastUpdateTime = block.timestamp;
@@ -228,23 +234,8 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
         rewardToken.safeTransferFrom(msg.sender, address(this), _amount);
     }
 
-    function emergencyWithdraw(address _user, uint256 _index) external onlyOwner {
-        UserInfo storage user = users[_user];
-        require(_index < user.stakes.length, "Invalid index");
-        StakeInfo storage info = user.stakes[_index];
-        require(!info.withdrawn, "Already withdrawn");
-
-        info.withdrawn = true;
-        totalWeightedStake -= info.weightedAmount;
-
-        if (info.amount > 0) {
-            stakingToken.safeTransfer(_user, info.amount);
-        }
-
-        emit EmergencyWithdrawn(_user, _index, info.amount);
-    }
-
     function recoverERC20(address _token, uint256 _amount) external onlyOwner {
+        require(_token != address(stakingToken), "Cannot recover staking token");
         IERC20(_token).safeTransfer(owner(), _amount);
     }
 }
