@@ -15,6 +15,11 @@ next-env.d.ts
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 
+# Tests
+**/*.test.*
+**/*.spec.*
+**/__tests__/**
+
 # Logs
 *.log
 

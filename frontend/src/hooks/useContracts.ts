@@ -19,8 +19,12 @@ const STAKE_ABI = [
   { inputs: [{ name: "_index", type: "uint256" }], name: "withdraw", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [{ name: "_index", type: "uint256" }], name: "earlyUnstake", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [], name: "claimReward", outputs: [], type: "function", stateMutability: "nonpayable" },
-  { inputs: [{ name: "_account", type: "address" }], name: "earnedNet", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
-  { inputs: [{ name: "_newContract", type: "address" }, { name: "_index", type: "uint256" }], name: "migrateTo", outputs: [], type: "function", stateMutability: "nonpayable" },
+  { inputs: [{ name: "_account", type: "address" }], name: "earned", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [], name: "LOCKDOWN_24H", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [], name: "LOCKDOWN_24H", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [], name: "LOCK_3M", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [], name: "LOCK_6M", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [], name: "LOCK_12M", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
 ] as const;
 
 const MINE_ABI = [
@@ -28,11 +32,13 @@ const MINE_ABI = [
   { inputs: [{ name: "_account", type: "address" }], name: "getUserTotalWeightedBalance", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [], name: "totalWeightedSupply", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [], name: "briRewardRate", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [], name: "xgovPointRate", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [{ name: "_stakeIndex", type: "uint256" }], name: "withdraw", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [{ name: "_stakeIndex", type: "uint256" }], name: "earlyUnstake", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [], name: "claimRewards", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [{ name: "_account", type: "address" }], name: "earnedBriNet", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
-  { inputs: [{ name: "_newContract", type: "address" }, { name: "_stakeIndex", type: "uint256" }], name: "migrateTo", outputs: [], type: "function", stateMutability: "nonpayable" },
+  { inputs: [{ name: "_account", type: "address" }], name: "earnedXgovPoints", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [], name: "LOCKDOWN_24H", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
 ] as const;
 
 const MARKETPLACE_ABI = [
@@ -42,15 +48,15 @@ const MARKETPLACE_ABI = [
 ] as const;
 
 const PLACEHOLDER = "0x...";
-const isReal = (a: string) => a !== PLACEHOLDER && !a.startsWith("0x0000");
+const isReal = (a: string | undefined) => !!a && a !== PLACEHOLDER && !a.startsWith("0x0000");
+
+export const LOCKDOWN_24H_SECONDS = 86400;
 
 const hNOBT = CONTRACTS.mainnet.hNOBT as Address;
 const brt = CONTRACTS.mainnet.broilerPlus as Address;
 const brtLP = CONTRACTS.mainnet.brtLP as Address;
 const vaultAddr = CONTRACTS.mainnet.vaultStaking as Address;
 const marketAddr = CONTRACTS.mainnet.marketplaceCore as Address;
-const stakeV1Addr = CONTRACTS.mainnet.stakeStakingV1 as Address;
-const mineV1Addr = CONTRACTS.mainnet.mineStakingV1 as Address;
 const hNobtCoreAddr = CONTRACTS.mainnet.hNobtCoreStaking as Address;
 const broilerCoreAddr = CONTRACTS.mainnet.broilerCoreStaking as Address;
 
@@ -74,26 +80,18 @@ export function useContracts() {
     hNOBTBalance: hNOBTBalance?.toString() ?? "0",
     brtBalance: brtBalance?.toString() ?? "0",
     brtLPBalance: brtLPBalance?.toString() ?? "0",
-    claimReward: () =>
+    claimRewardStake: () =>
       writeContractAsync({ abi: STAKE_ABI, address: hNobtCoreAddr, functionName: "claimReward", args: [] } as any),
-    claimRewards: () =>
+    claimRewardsMine: () =>
       writeContractAsync({ abi: MINE_ABI, address: broilerCoreAddr, functionName: "claimRewards", args: [] } as any),
-    withdrawV1Stake: (index: number) =>
-      writeContractAsync({ abi: STAKE_ABI, address: stakeV1Addr, functionName: "withdraw", args: [BigInt(index)] } as any),
-    earlyUnstakeV1Stake: (index: number) =>
-      writeContractAsync({ abi: STAKE_ABI, address: stakeV1Addr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
-    claimV1Reward: () =>
-      writeContractAsync({ abi: STAKE_ABI, address: stakeV1Addr, functionName: "claimReward", args: [] } as any),
-    withdrawV1Mine: (index: number) =>
-      writeContractAsync({ abi: MINE_ABI, address: mineV1Addr, functionName: "withdraw", args: [BigInt(index)] } as any),
-    earlyUnstakeV1Mine: (index: number) =>
-      writeContractAsync({ abi: MINE_ABI, address: mineV1Addr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
-    claimV1MineRewards: () =>
-      writeContractAsync({ abi: MINE_ABI, address: mineV1Addr, functionName: "claimRewards", args: [] } as any),
-    migrateV1Stake: (index: number) =>
-      writeContractAsync({ abi: STAKE_ABI, address: stakeV1Addr, functionName: "migrateTo", args: [hNobtCoreAddr, BigInt(index)] } as any),
-    migrateV1Mine: (index: number) =>
-      writeContractAsync({ abi: MINE_ABI, address: mineV1Addr, functionName: "migrateTo", args: [broilerCoreAddr, BigInt(index)] } as any),
+    withdrawStake: (index: number) =>
+      writeContractAsync({ abi: STAKE_ABI, address: hNobtCoreAddr, functionName: "withdraw", args: [BigInt(index)] } as any),
+    earlyUnstakeStake: (index: number) =>
+      writeContractAsync({ abi: STAKE_ABI, address: hNobtCoreAddr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
+    withdrawMine: (index: number) =>
+      writeContractAsync({ abi: MINE_ABI, address: broilerCoreAddr, functionName: "withdraw", args: [BigInt(index)] } as any),
+    earlyUnstakeMine: (index: number) =>
+      writeContractAsync({ abi: MINE_ABI, address: broilerCoreAddr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
     depositVault: (amt: string) =>
       writeContractAsync({ abi: STAKE_ABI, address: vaultAddr, functionName: "stake", args: [BigInt(amt), 1] } as any),
     buyListing: (id: number, value: string) =>

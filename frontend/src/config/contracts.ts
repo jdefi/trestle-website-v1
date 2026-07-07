@@ -7,16 +7,12 @@ export const CONTRACTS = {
     hNOBT: "0xcF51ab7398315DbA6588Aa7fb3Df7c99D3D1F4dD",
     broilerPlus: "0xeCb4cAc0C9e5cBd42a9Ed36467ce8f96072AD58b",
     brtLP: "0xc445b18b3ff85e0691fe416ad91e456f8697b166",
-    marketplaceCore: "0x...",
-    digitalGoods: "0x...",
-    freelancerEscrow: "0x...",
-    stakeStakingV1: "0xdc2b9a63CE40A64B47f484B0843FDcBEe9447b6d",
-    mineStakingV1: "0x214068a99c541BFD1c6267Ee69B78fAe8426F3c0",
     vaultStaking: "0x...",
     governanceToken: "0x...",
     feeDistributor: "0x...",
     hNobtCoreStaking: "0x1d7d8a7B24Be9ecc692f36c7C01486EfF6c689d7",
     broilerCoreStaking: "0xF68A17c7e15174D55AFDb2EF7669Ad04F561AD48",
+    marketplaceCore: "0x...",
   },
 };
 
