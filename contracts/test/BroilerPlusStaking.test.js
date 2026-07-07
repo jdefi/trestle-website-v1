@@ -670,6 +670,75 @@ describe("BroilerPlusStaking", function () {
     });
   });
 
+  describe("getUserStake view", function () {
+    it("should return correct stake slot data", async function () {
+      await staking.connect(user1).stake(ethers.parseEther("100"), 1, ethers.ZeroAddress);
+      const [amount, lockEndTime, multiplier, stakeTime, withdrawn] =
+        await staking.getUserStake(user1.address, 0);
+
+      expect(amount).to.equal(ethers.parseEther("100"));
+      expect(multiplier).to.equal(14000);
+      expect(withdrawn).to.equal(false);
+      expect(lockEndTime).to.be.gt(stakeTime);
+      expect(stakeTime).to.be.gt(0);
+    });
+
+    it("should revert with invalid index", async function () {
+      await staking.connect(user1).stake(ethers.parseEther("100"), 1, ethers.ZeroAddress);
+      await expect(
+        staking.getUserStake(user1.address, 5)
+      ).to.be.revertedWith("Invalid index");
+    });
+  });
+
+  describe("setMigrationSource / onMigrate / migrateTo", function () {
+    it("should allow owner to set migrationSource", async function () {
+      await staking.connect(owner).setMigrationSource(ethers.ZeroAddress);
+      expect(await staking.migrationSource()).to.equal(ethers.ZeroAddress);
+    });
+
+    it("should reject setMigrationSource from non-owner", async function () {
+      await expect(
+        staking.connect(user1).setMigrationSource(ethers.ZeroAddress)
+      ).to.be.revertedWithCustomError(staking, "OwnableUnauthorizedAccount");
+    });
+
+    it("should accept migrated stake via onMigrate from authorized source", async function () {
+      await staking.connect(user1).stake(ethers.parseEther("100"), 1, ethers.ZeroAddress);
+      await ethers.provider.send("evm_increaseTime", [LOCKDOWN + 1]);
+      await ethers.provider.send("evm_mine");
+
+      const source = await staking.getAddress();
+      const v2 = await (await ethers.getContractFactory("BroilerPlusStaking")).connect(owner).deploy(
+        await lpToken.getAddress(),
+        await briToken.getAddress()
+      );
+      await v2.connect(owner).setMigrationSource(source);
+
+      await staking.connect(user1).migrateTo(await v2.getAddress(), 0);
+
+      const [amount, lockEndTime, multiplier, stakeTime, withdrawn] =
+        await v2.getUserStake(user1.address, 0);
+
+      expect(amount).to.equal(ethers.parseEther("100"));
+      expect(multiplier).to.equal(14000);
+      expect(withdrawn).to.equal(false);
+      expect(lockEndTime).to.equal(await staking.getUserStake(user1.address, 0).then(s => s[1]));
+      expect(stakeTime).to.equal(await staking.getUserStake(user1.address, 0).then(s => s[3]));
+    });
+
+    it("should reject onMigrate from unauthorized source", async function () {
+      const v2 = await (await ethers.getContractFactory("BroilerPlusStaking")).connect(owner).deploy(
+        await lpToken.getAddress(),
+        await briToken.getAddress()
+      );
+
+      await expect(
+        v2.connect(user1).onMigrate(user1.address, ethers.parseEther("100"), 1, 14000, 1, 0, 0)
+      ).to.be.revertedWith("Not authorized migration source");
+    });
+  });
+
   describe("BRT 5% transfer fee — gross-up accounting", function () {
     const FEE_BPS = 500n;
     const DENOM = 10000n;
@@ -758,8 +827,8 @@ describe("BroilerPlusStaking", function () {
       expect(event.args.briPaid).to.be.closeTo(expectedNet, 2000000000000000000n);
     });
   });
-});
 
+});
 describe("BroilerPlusStaking — Cross-contract invariants", function () {
   this.timeout(60000);
   let lpToken, briToken, staking;

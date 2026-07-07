@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { href: "/#tokens", label: "Tokens" },
   { href: "/#roadmap", label: "Roadmap" },
   { href: "/app", label: "App" },
-  { href: "https://docs.trestle.website", label: "Docs", external: true },
+  { href: LINKS.blog, label: "Blog", external: true },
   { href: "https://reward.trestle.website", label: "Reward Hub", external: true },
   { href: "https://testnet.trestle.website", label: "Testnet", external: true },
 ];

@@ -10,11 +10,13 @@ export const CONTRACTS = {
     marketplaceCore: "0x...",
     digitalGoods: "0x...",
     freelancerEscrow: "0x...",
-    stakeStaking: "0xdc2b9a63CE40A64B47f484B0843FDcBEe9447b6d",
-    mineStaking: "0x214068a99c541BFD1c6267Ee69B78fAe8426F3c0",
+    stakeStakingV1: "0xdc2b9a63CE40A64B47f484B0843FDcBEe9447b6d",
+    mineStakingV1: "0x214068a99c541BFD1c6267Ee69B78fAe8426F3c0",
     vaultStaking: "0x...",
     governanceToken: "0x...",
     feeDistributor: "0x...",
+    hNobtCoreStaking: "0x1d7d8a7B24Be9ecc692f36c7C01486EfF6c689d7",
+    broilerCoreStaking: "0xF68A17c7e15174D55AFDb2EF7669Ad04F561AD48",
   },
 };
 
@@ -23,6 +25,8 @@ export const LINKS = {
   discord: "https://discord.gg/4dCCvnJYGT",
   github: "https://github.com/Trestle-DeFi",
   docs: "https://docs.trestle.website",
+  blog: "https://blog.trestle.website",
   telegramApp: "https://t.me/trestlehub_bot",
   whitepaper: "https://trestle-defi.github.io/trestle-whitepaper",
+  medium: "https://medium.com/@trestle_defi",
 };

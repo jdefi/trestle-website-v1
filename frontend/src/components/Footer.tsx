@@ -35,7 +35,7 @@ export default function Footer() {
           <ul className="space-y-2 text-sm">
             <li><a href={LINKS.discord} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Icon name="discord" size={14} /> Discord</a></li>
             <li><a href={LINKS.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Icon name="telegram" size={14} /> Telegram</a></li>
-            <li><a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Icon name="github" size={14} /> GitHub</a></li>
+            <li><a href={LINKS.medium} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Icon name="medium" size={14} /> Medium</a></li>
             <li><a href={LINKS.whitepaper} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Icon name="file-text" size={14} /> Whitepaper</a></li>
           </ul>
         </div>

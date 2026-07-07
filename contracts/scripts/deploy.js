@@ -25,14 +25,14 @@ async function main() {
   }
 
   const feeData = await provider.getFeeData();
-  const GAS_PRICE = feeData.gasPrice ? (feeData.gasPrice * 110n / 100n) : ethers.parseUnits("50", "gwei");
-
   const balance = await provider.getBalance(wallet.address);
   console.log("Network:", network.name, `(${chainId})`);
   console.log("Deployer:", wallet.address);
   console.log("Balance:", ethers.formatEther(balance), "MATIC");
   console.log("RPC:", RPC_URL);
-  console.log("Gas price:", ethers.formatUnits(GAS_PRICE, "gwei"), "gwei\n");
+  console.log("Gas price:", feeData.gasPrice ? ethers.formatUnits(feeData.gasPrice, "gwei") + " gwei" : "EIP-1559 auto");
+  console.log("Max fee:", feeData.maxFeePerGas ? ethers.formatUnits(feeData.maxFeePerGas, "gwei") + " gwei" : "N/A");
+  console.log("Priority fee:", feeData.maxPriorityFeePerGas ? ethers.formatUnits(feeData.maxPriorityFeePerGas, "gwei") + " gwei" : "N/A\n");
 
   if (balance === 0n) {
     console.error("❌ Zero balance — fund the deployer first");
@@ -49,9 +49,8 @@ async function main() {
   };
 
   async function sendTx(txReq) {
-    const nonce = await provider.getTransactionCount(wallet.address, "pending");
-    const tx = await wallet.sendTransaction({ ...txReq, gasPrice: GAS_PRICE, nonce });
-    console.log(`  tx: ${tx.hash} (nonce: ${nonce})`);
+    const tx = await wallet.sendTransaction(txReq);
+    console.log(`  tx: ${tx.hash}`);
     console.log("  waiting for receipt...");
     const receipt = await Promise.race([
       tx.wait(1),
@@ -79,14 +78,16 @@ async function main() {
   const broilerAddr = await deployContract("BroilerPlusStaking", [BRT_LP, BRT]);
 
   const DAY = 86400;
-  const rate = ethers.parseUnits("1", 9); // BRT has 9 decimals
+  const hNobtRate = 1_000_000_000n;            // 1e9
+  const broilerBriRate = 1_000_000_000n;       // 1e9
+  const broilerXgovRate = 1_000_000_000n;      // 1e9
 
   console.log("\n[Config] Setting reward rates...");
 
   const hNobtIface = new ethers.Interface(artifactPath("hNobtStaking").abi);
   let receipt = await sendTx({
     to: hNobtAddr,
-    data: hNobtIface.encodeFunctionData("setRewardRate", [rate, 30 * DAY]),
+    data: hNobtIface.encodeFunctionData("setRewardRate", [hNobtRate, 30 * DAY]),
     gasLimit: 500_000n,
   });
   console.log(`  hNobtStaking rate set (tx: ${receipt.hash}, block: ${receipt.blockNumber})`);
@@ -94,7 +95,7 @@ async function main() {
   const broilerIface = new ethers.Interface(artifactPath("BroilerPlusStaking").abi);
   receipt = await sendTx({
     to: broilerAddr,
-    data: broilerIface.encodeFunctionData("setRewardRate", [rate, rate, 30 * DAY]),
+    data: broilerIface.encodeFunctionData("setRewardRate", [broilerBriRate, broilerXgovRate, 30 * DAY]),
     gasLimit: 500_000n,
   });
   console.log(`  BroilerPlusStaking rates set (tx: ${receipt.hash}, block: ${receipt.blockNumber})`);

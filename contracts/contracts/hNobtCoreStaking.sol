@@ -3,20 +3,19 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-/// @title hNobtStaking
-/// @notice Stake hNOBT to earn BRT rewards.
-/// @dev BRT (rewardToken) carries a 5% transfer fee. All outgoing
-///      BRT transfers are grossed up via _grossUp() so the recipient
-///      receives the full advertised reward amount.
-contract hNobtStaking is Ownable, ReentrancyGuard {
+/// @title hNobtCoreStaking
+/// @notice Stake hNOBT to earn BRT rewards with lock-up multipliers.
+/// @dev UUPS upgradeable. BRT carries a 5% transfer fee — outgoing transfers are grossed up.
+contract hNobtCoreStaking is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     using SafeERC20 for IERC20;
 
-    IERC20 public immutable stakingToken;
-    IERC20 public immutable rewardToken;
-
+    IERC20 public stakingToken;
+    IERC20 public rewardToken;
+    
     uint256 public rewardRate;
     uint256 public rewardPerTokenStored;
     uint256 public lastUpdateTime;
@@ -29,8 +28,8 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
         uint256 lockEndTime;
         uint256 lockMultiplier;
         uint256 stakeTime;
-        uint256 rewardDebtSnapshotBri;
         bool withdrawn;
+        uint256 rewardDebtSnapshotBri;
     }
 
     struct UserInfo {
@@ -51,7 +50,7 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
     uint256 public constant MULT_12M = 15000;
     uint256 public constant MULT_BASE = 10000;
 
-    uint256 public constant BRI_TRANSFER_FEE_BPS = 500; // 5% fee on BRT transfers
+    uint256 public constant BRI_TRANSFER_FEE_BPS = 500;
     uint256 public constant BRI_FEE_DENOMINATOR = 10000;
 
     uint256 public maxRewardRate;
@@ -61,29 +60,51 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
     event Staked(address indexed user, uint256 index, uint256 amount, uint8 lockPeriod);
     event Withdrawn(address indexed user, uint256 index, uint256 amount);
     event RewardClaimed(address indexed user, uint256 amount);
-    event RewardRateUpdated(uint256 rate, uint256 duration);
     event EarlyUnstaked(address indexed user, uint256 index, uint256 amount, uint256 rewardPenalty);
-    event Migrated(address indexed user, uint256 index, address indexed newContract, uint256 amount);
-    event Upgraded(address indexed user, uint256 index, address indexed newContract, uint256 amount);
+    event EmergencyWithdrawn(address indexed user, uint256 index, uint256 amount);
+    event RewardRateUpdated(uint256 rate, uint256 duration);
+    event Migrated(address indexed user, uint256 indexed index, address indexed newContract, uint256 amount);
 
-    constructor(address _stakingToken, address _rewardToken) Ownable(msg.sender) {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    uint256 private _status; // ReentrancyGuard: 0 = not entered, 1 = entered
+
+    modifier nonReentrant() {
+        require(_status != 1, "ReentrancyGuard: reentrant call");
+        _status = 1;
+        _;
+        _status = 0;
+    }
+
+    function initialize(address _stakingToken, address _rewardToken) external initializer {
+        __Ownable_init(msg.sender);
+
         stakingToken = IERC20(_stakingToken);
         rewardToken = IERC20(_rewardToken);
         lastUpdateTime = block.timestamp;
     }
 
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+
     modifier updateReward(address _account) {
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = lastTimeRewardApplicable();
+
         if (_account != address(0)) {
             UserInfo storage user = users[_account];
-            user.pendingRewards = earned(_account);
+            uint256 currentWeighted = userWeightedStake(_account);
+            uint256 newRewards = (currentWeighted * (rewardPerTokenStored - user.rewardDebt)) / 1e18;
+            user.pendingRewards += newRewards;
             user.rewardDebt = rewardPerTokenStored;
         }
         _;
     }
 
     function lastTimeRewardApplicable() public view returns (uint256) {
+        if (rewardFinishTime == 0) return block.timestamp;
         return block.timestamp < rewardFinishTime ? block.timestamp : rewardFinishTime;
     }
 
@@ -105,33 +126,15 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
         return total;
     }
 
-    /// @notice Read a specific stake slot for a user.
-    function getUserStake(address _user, uint256 _index) external view returns (
-        uint256 amount,
-        uint256 lockEndTime,
-        uint256 lockMultiplier,
-        uint256 stakeTime,
-        bool withdrawn
-    ) {
-        UserInfo storage user = users[_user];
-        require(_index < user.stakes.length, "Invalid index");
-        StakeInfo storage s = user.stakes[_index];
-        return (s.amount, s.lockEndTime, s.lockMultiplier, s.stakeTime, s.withdrawn);
-    }
-
-    /// @notice Gross up an amount to account for the 5% BRT transfer fee.
     function _grossUp(uint256 netAmount) internal pure returns (uint256) {
         return (netAmount * BRI_FEE_DENOMINATOR) / (BRI_FEE_DENOMINATOR - BRI_TRANSFER_FEE_BPS);
     }
 
     function earned(address _account) public view returns (uint256) {
         UserInfo storage user = users[_account];
-        uint256 weighted = userWeightedStake(_account);
-        return (weighted * (rewardPerToken() - user.rewardDebt) / 1e18) + user.pendingRewards;
-    }
-
-    function earnedNet(address _account) public view returns (uint256) {
-        return _grossUp(earned(_account));
+        uint256 currentWeighted = userWeightedStake(_account);
+        uint256 delta = (currentWeighted * (rewardPerToken() - user.rewardDebt)) / 1e18;
+        return user.pendingRewards + delta;
     }
 
     function stake(uint256 _amount, uint8 _lockPeriod) external nonReentrant updateReward(msg.sender) {
@@ -140,7 +143,6 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
 
         uint256 duration;
         uint256 multiplier;
-
         if (_lockPeriod == 1) {
             duration = LOCK_3M;
             multiplier = MULT_3M;
@@ -153,8 +155,7 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
         }
 
         stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
-
-        uint256 weighted = _amount * multiplier / MULT_BASE;
+        uint256 weighted = (_amount * multiplier) / MULT_BASE;
 
         UserInfo storage user = users[msg.sender];
         user.stakes.push(StakeInfo({
@@ -163,12 +164,11 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
             lockEndTime: block.timestamp + duration,
             lockMultiplier: multiplier,
             stakeTime: block.timestamp,
-            rewardDebtSnapshotBri: rewardPerTokenStored,
-            withdrawn: false
+            withdrawn: false,
+            rewardDebtSnapshotBri: rewardPerTokenStored
         }));
 
         totalWeightedStake += weighted;
-
         emit Staked(msg.sender, user.stakes.length - 1, _amount, _lockPeriod);
     }
 
@@ -181,9 +181,7 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
 
         info.withdrawn = true;
         totalWeightedStake -= info.weightedAmount;
-
         stakingToken.safeTransfer(msg.sender, info.amount);
-
         emit Withdrawn(msg.sender, _index, info.amount);
     }
 
@@ -192,25 +190,20 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
         require(_index < user.stakes.length, "Invalid index");
         StakeInfo storage info = user.stakes[_index];
         require(!info.withdrawn, "Already withdrawn");
-        require(info.lockEndTime > 0, "Invalid stake");
-        require(block.timestamp >= info.stakeTime + LOCKDOWN_24H, "24h lockdown not passed");
-        require(block.timestamp < info.lockEndTime, "Lock expired, use withdraw");
+        require(block.timestamp >= info.stakeTime + LOCKDOWN_24H, "24h lock active");
+        require(block.timestamp < info.lockEndTime, "Use regular withdraw");
 
-        uint256 currentRewardPerToken = rewardPerTokenStored;
-        uint256 stakeReward = (info.weightedAmount * (currentRewardPerToken - info.rewardDebtSnapshotBri) / 1e18);
+        uint256 stakeReward = (info.weightedAmount * (rewardPerTokenStored - info.rewardDebtSnapshotBri) / 1e18);
+        if (stakeReward > user.pendingRewards) {
+            stakeReward = user.pendingRewards;
+        }
 
         uint256 penalty = stakeReward / 2;
         uint256 rewardToSend = stakeReward - penalty;
 
+        user.pendingRewards -= stakeReward;
         info.withdrawn = true;
         totalWeightedStake -= info.weightedAmount;
-        user.rewardDebt = currentRewardPerToken;
-
-        if (user.pendingRewards > stakeReward) {
-            user.pendingRewards -= stakeReward;
-        } else {
-            user.pendingRewards = 0;
-        }
 
         stakingToken.safeTransfer(msg.sender, info.amount);
         if (rewardToSend > 0) {
@@ -222,103 +215,64 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
 
     function claimReward() external nonReentrant updateReward(msg.sender) {
         UserInfo storage user = users[msg.sender];
+        require(user.pendingRewards > 0, "No rewards");
         uint256 amount = user.pendingRewards;
-        require(amount > 0, "No rewards");
-
         user.pendingRewards = 0;
         rewardToken.safeTransfer(msg.sender, _grossUp(amount));
+        emit RewardClaimed(msg.sender, amount);
+    }
 
-        emit RewardClaimed(msg.sender, _grossUp(amount));
+    function emergencyWithdraw(uint256 _index) external nonReentrant updateReward(msg.sender) {
+        UserInfo storage user = users[msg.sender];
+        require(_index < user.stakes.length, "Invalid index");
+        StakeInfo storage info = user.stakes[_index];
+        require(!info.withdrawn, "Already withdrawn");
+
+        info.withdrawn = true;
+        totalWeightedStake -= info.weightedAmount;
+        stakingToken.safeTransfer(msg.sender, info.amount);
+        user.pendingRewards = 0;
+        emit EmergencyWithdrawn(msg.sender, _index, info.amount);
     }
 
     function setMaxRewardRate(uint256 _max) external onlyOwner {
         maxRewardRate = _max;
     }
 
+    function setRewardRate(uint256 _rate, uint256 _duration) external onlyOwner updateReward(address(0)) {
+        require(_duration > 0, "Duration must be positive");
+        require(maxRewardRate == 0 || _rate <= maxRewardRate, "Rate exceeds max");
+        rewardRate = _rate;
+        rewardFinishTime = block.timestamp + _duration;
+        emit RewardRateUpdated(_rate, _duration);
+    }
+
+    function migrateStakes(address _user, uint256 _lockEndTime, uint256 _weightedAmount) external onlyOwner {
+        UserInfo storage user = users[_user];
+        
+        for (uint256 i = 0; i < user.stakes.length; i++) {
+            StakeInfo storage existing = user.stakes[i];
+            if (existing.lockEndTime == _lockEndTime && existing.weightedAmount == _weightedAmount) {
+                revert("Stake already exists");
+            }
+        }
+        
+        user.stakes.push(StakeInfo({
+            amount: 0,
+            weightedAmount: _weightedAmount,
+            lockEndTime: _lockEndTime,
+            lockMultiplier: 0,
+            stakeTime: 0,
+            withdrawn: false,
+            rewardDebtSnapshotBri: rewardPerTokenStored
+        }));
+        totalWeightedStake += _weightedAmount;
+    }
+
     function setMigrationSource(address _source) external onlyOwner {
         migrationSource = _source;
     }
 
-    function setRewardRate(uint256 _rate, uint256 _duration) external onlyOwner updateReward(address(0)) {
-        require(_duration > 0, "Duration must be > 0");
-        require(maxRewardRate == 0 || _rate <= maxRewardRate, "Rate exceeds max");
-        rewardRate = _rate;
-        rewardFinishTime = block.timestamp + _duration;
-        lastUpdateTime = block.timestamp;
-        emit RewardRateUpdated(_rate, _duration);
-    }
-
-    function fundRewards(uint256 _amount) external {
-        rewardToken.safeTransferFrom(msg.sender, address(this), _amount);
-    }
-
-    function recoverERC20(address _token, uint256 _amount) external onlyOwner {
-        require(_token != address(stakingToken), "Cannot recover staking token");
-        IERC20(_token).safeTransfer(owner(), _amount);
-    }
-
-    /// @notice Migrate one of your active stakes to a new staking contract.
-    /// @dev Transfers the staked tokens and calls onMigrate on the new contract.
-    ///      Requires 24h lockdown to have passed.
-    function migrateTo(address _newContract, uint256 _index) external nonReentrant updateReward(msg.sender) {
-        UserInfo storage user = users[msg.sender];
-        require(_index < user.stakes.length, "Invalid index");
-        StakeInfo storage slot = user.stakes[_index];
-        require(!slot.withdrawn, "Already withdrawn");
-        require(block.timestamp >= slot.stakeTime + LOCKDOWN_24H, "24h lockdown not passed");
-
-        uint256 amount = slot.amount;
-        uint256 weighted = slot.weightedAmount;
-        uint256 multiplier = slot.lockMultiplier;
-        uint256 rewardDebt = slot.rewardDebtSnapshotBri;
-
-        slot.withdrawn = true;
-        totalWeightedStake -= weighted;
-
-        stakingToken.safeTransfer(_newContract, amount);
-
-        INewStakingContract(_newContract).onMigrate(
-            msg.sender,
-            amount,
-            slot.lockEndTime,
-            multiplier,
-            slot.stakeTime,
-            rewardDebt
-        );
-
-        emit Migrated(msg.sender, _index, _newContract, amount);
-    }
-
-    /// @notice Owner can upgrade any user's active stake to a new contract (bypasses 24h lockdown).
-    function upgradeStake(address _user, uint256 _index, address _newContract) external onlyOwner nonReentrant updateReward(_user) {
-        UserInfo storage user = users[_user];
-        require(_index < user.stakes.length, "Invalid index");
-        StakeInfo storage slot = user.stakes[_index];
-        require(!slot.withdrawn, "Already withdrawn");
-
-        uint256 amount = slot.amount;
-        uint256 weighted = slot.weightedAmount;
-        uint256 multiplier = slot.lockMultiplier;
-        uint256 rewardDebt = slot.rewardDebtSnapshotBri;
-
-        slot.withdrawn = true;
-        totalWeightedStake -= weighted;
-
-        stakingToken.safeTransfer(_newContract, amount);
-
-        INewStakingContract(_newContract).onMigrate(
-            _user,
-            amount,
-            slot.lockEndTime,
-            multiplier,
-            slot.stakeTime,
-            rewardDebt
-        );
-
-        emit Upgraded(_user, _index, _newContract, amount);
-    }
-
-    /// @notice Receive a migrated stake from the old staking contract.
     function onMigrate(
         address _user,
         uint256 _amount,
@@ -327,7 +281,7 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
         uint256 _stakeTime,
         uint256 _rewardDebtSnapshot
     ) external {
-        require(msg.sender == migrationSource, "Not authorized migration source");
+        require(msg.sender == migrationSource, "Not authorized");
 
         uint256 weighted = (_amount * _lockMultiplier) / MULT_BASE;
 
@@ -343,9 +297,38 @@ contract hNobtStaking is Ownable, ReentrancyGuard {
 
         totalWeightedStake += weighted;
     }
+
+    function migrateTo(address _newContract, uint256 _index) external nonReentrant updateReward(msg.sender) {
+        UserInfo storage user = users[msg.sender];
+        require(_index < user.stakes.length, "Invalid index");
+        StakeInfo storage slot = user.stakes[_index];
+        require(!slot.withdrawn, "Already withdrawn");
+        require(block.timestamp >= slot.stakeTime + LOCKDOWN_24H, "24h lockdown not passed");
+
+        uint256 amount = slot.amount;
+        uint256 weighted = slot.weightedAmount;
+
+        slot.withdrawn = true;
+        totalWeightedStake -= weighted;
+
+        stakingToken.safeTransfer(_newContract, amount);
+
+        INewHnobtCoreStaking(_newContract).onMigrate(
+            msg.sender,
+            amount,
+            slot.lockEndTime,
+            slot.lockMultiplier,
+            slot.stakeTime,
+            slot.rewardDebtSnapshotBri
+        );
+
+        emit Migrated(msg.sender, _index, _newContract, amount);
+    }
+
+    uint256[50] private __gap;
 }
 
-interface INewStakingContract {
+interface INewHnobtCoreStaking {
     function onMigrate(
         address user,
         uint256 amount,

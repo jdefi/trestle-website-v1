@@ -599,4 +599,73 @@ describe("hNobtStaking", function () {
       expect(earned2).to.be.gte(earned1);
     });
   });
+
+  describe("getUserStake view", function () {
+    it("should return correct stake data after staking", async function () {
+      await staking.connect(user1).stake(ethers.parseEther("100"), 1);
+      const [amount, lockEndTime, lockMultiplier, stakeTime, withdrawn] =
+        await staking.getUserStake(user1.address, 0);
+
+      expect(amount).to.equal(ethers.parseEther("100"));
+      expect(lockMultiplier).to.equal(10000);
+      expect(withdrawn).to.equal(false);
+      expect(lockEndTime).to.be.gt(stakeTime);
+      expect(stakeTime).to.be.gt(0);
+    });
+
+    it("should revert with invalid index", async function () {
+      await staking.connect(user1).stake(ethers.parseEther("100"), 1);
+      await expect(
+        staking.getUserStake(user1.address, 5)
+      ).to.be.revertedWith("Invalid index");
+    });
+  });
+
+  describe("setMigrationSource / onMigrate / migrateTo", function () {
+    it("should allow owner to set migrationSource", async function () {
+      await staking.connect(owner).setMigrationSource(ethers.ZeroAddress);
+      expect(await staking.migrationSource()).to.equal(ethers.ZeroAddress);
+    });
+
+    it("should reject setMigrationSource from non-owner", async function () {
+      await expect(
+        staking.connect(user1).setMigrationSource(ethers.ZeroAddress)
+      ).to.be.revertedWithCustomError(staking, "OwnableUnauthorizedAccount");
+    });
+
+    it("should accept migrated stake via onMigrate from authorized source", async function () {
+      await staking.connect(user1).stake(ethers.parseEther("100"), 1);
+      await ethers.provider.send("evm_increaseTime", [LOCKDOWN + 1]);
+      await ethers.provider.send("evm_mine");
+
+      const source = await staking.getAddress();
+      const v2 = await (await ethers.getContractFactory("hNobtStaking")).connect(owner).deploy(
+        await stakingToken.getAddress(),
+        await rewardToken.getAddress()
+      );
+      await v2.connect(owner).setMigrationSource(source);
+
+      await staking.connect(user1).migrateTo(await v2.getAddress(), 0);
+
+      const [amount, lockEndTime, lockMultiplier, stakeTime, withdrawn] =
+        await v2.getUserStake(user1.address, 0);
+
+      expect(amount).to.equal(ethers.parseEther("100"));
+      expect(lockMultiplier).to.equal(10000);
+      expect(withdrawn).to.equal(false);
+      expect(lockEndTime).to.equal(await staking.getUserStake(user1.address, 0).then(s => s[1]));
+      expect(stakeTime).to.equal(await staking.getUserStake(user1.address, 0).then(s => s[3]));
+    });
+
+    it("should reject onMigrate from unauthorized source", async function () {
+      const v2 = await (await ethers.getContractFactory("hNobtStaking")).connect(owner).deploy(
+        await stakingToken.getAddress(),
+        await rewardToken.getAddress()
+      );
+
+      await expect(
+        v2.connect(user1).onMigrate(user1.address, ethers.parseEther("100"), 1, 10000, 1, 0)
+      ).to.be.revertedWith("Not authorized migration source");
+    });
+  });
 });

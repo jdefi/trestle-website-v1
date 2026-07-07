@@ -20,6 +20,7 @@ const STAKE_ABI = [
   { inputs: [{ name: "_index", type: "uint256" }], name: "earlyUnstake", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [], name: "claimReward", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [{ name: "_account", type: "address" }], name: "earnedNet", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [{ name: "_newContract", type: "address" }, { name: "_index", type: "uint256" }], name: "migrateTo", outputs: [], type: "function", stateMutability: "nonpayable" },
 ] as const;
 
 const MINE_ABI = [
@@ -31,6 +32,7 @@ const MINE_ABI = [
   { inputs: [{ name: "_stakeIndex", type: "uint256" }], name: "earlyUnstake", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [], name: "claimRewards", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [{ name: "_account", type: "address" }], name: "earnedBriNet", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
+  { inputs: [{ name: "_newContract", type: "address" }, { name: "_stakeIndex", type: "uint256" }], name: "migrateTo", outputs: [], type: "function", stateMutability: "nonpayable" },
 ] as const;
 
 const MARKETPLACE_ABI = [
@@ -45,10 +47,12 @@ const isReal = (a: string) => a !== PLACEHOLDER && !a.startsWith("0x0000");
 const hNOBT = CONTRACTS.mainnet.hNOBT as Address;
 const brt = CONTRACTS.mainnet.broilerPlus as Address;
 const brtLP = CONTRACTS.mainnet.brtLP as Address;
-const stakeAddr = CONTRACTS.mainnet.stakeStaking as Address;
-const mineAddr = CONTRACTS.mainnet.mineStaking as Address;
 const vaultAddr = CONTRACTS.mainnet.vaultStaking as Address;
 const marketAddr = CONTRACTS.mainnet.marketplaceCore as Address;
+const stakeV1Addr = CONTRACTS.mainnet.stakeStakingV1 as Address;
+const mineV1Addr = CONTRACTS.mainnet.mineStakingV1 as Address;
+const hNobtCoreAddr = CONTRACTS.mainnet.hNobtCoreStaking as Address;
+const broilerCoreAddr = CONTRACTS.mainnet.broilerCoreStaking as Address;
 
 export function useContracts() {
   const { address, isConnected } = useAccount();
@@ -60,8 +64,8 @@ export function useContracts() {
 
   const { writeContractAsync } = useWriteContract();
 
-  const { data: hNOBTAllowance } = useReadContract({ abi: ERC20_ABI, address: hNOBT, functionName: "allowance", args: address ? [address, stakeAddr] : undefined, query: { enabled: !!address } });
-  const { data: lpAllowance } = useReadContract({ abi: ERC20_ABI, address: brtLP, functionName: "allowance", args: address ? [address, mineAddr] : undefined, query: { enabled: !!address } });
+  const { data: hNOBTCoreAllowance } = useReadContract({ abi: ERC20_ABI, address: hNOBT, functionName: "allowance", args: address ? [address, hNobtCoreAddr] : undefined, query: { enabled: !!address } });
+  const { data: lpCoreAllowance } = useReadContract({ abi: ERC20_ABI, address: brtLP, functionName: "allowance", args: address ? [address, broilerCoreAddr] : undefined, query: { enabled: !!address } });
 
   return {
     address,
@@ -70,39 +74,47 @@ export function useContracts() {
     hNOBTBalance: hNOBTBalance?.toString() ?? "0",
     brtBalance: brtBalance?.toString() ?? "0",
     brtLPBalance: brtLPBalance?.toString() ?? "0",
-    hNOBTAllowance: hNOBTAllowance?.toString() ?? "0",
-    lpAllowance: lpAllowance?.toString() ?? "0",
-    stakeHnobt: (amt: string, lockPeriod: number) =>
-      writeContractAsync({ abi: STAKE_ABI, address: stakeAddr, functionName: "stake", args: [BigInt(amt), lockPeriod] } as any),
-    approveHnobt: (amt: string) =>
-      writeContractAsync({ abi: ERC20_ABI, address: hNOBT, functionName: "approve", args: [stakeAddr, BigInt(amt)] } as any),
-    withdrawStake: (index: number) =>
-      writeContractAsync({ abi: STAKE_ABI, address: stakeAddr, functionName: "withdraw", args: [BigInt(index)] } as any),
-    earlyUnstakeStake: (index: number) =>
-      writeContractAsync({ abi: STAKE_ABI, address: stakeAddr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
     claimReward: () =>
-      writeContractAsync({ abi: STAKE_ABI, address: stakeAddr, functionName: "claimReward", args: [] } as any),
-    stakeLP: (amt: string, lockPeriod: number, referrer?: string) =>
-      writeContractAsync({ abi: MINE_ABI, address: mineAddr, functionName: "stake", args: [BigInt(amt), lockPeriod, referrer || "0x0000000000000000000000000000000000000000"] } as any),
-    approveLP: (amt: string) =>
-      writeContractAsync({ abi: ERC20_ABI, address: brtLP, functionName: "approve", args: [mineAddr, BigInt(amt)] } as any),
-    withdrawMine: (index: number) =>
-      writeContractAsync({ abi: MINE_ABI, address: mineAddr, functionName: "withdraw", args: [BigInt(index)] } as any),
-    earlyUnstakeMine: (index: number) =>
-      writeContractAsync({ abi: MINE_ABI, address: mineAddr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
+      writeContractAsync({ abi: STAKE_ABI, address: hNobtCoreAddr, functionName: "claimReward", args: [] } as any),
     claimRewards: () =>
-      writeContractAsync({ abi: MINE_ABI, address: mineAddr, functionName: "claimRewards", args: [] } as any),
+      writeContractAsync({ abi: MINE_ABI, address: broilerCoreAddr, functionName: "claimRewards", args: [] } as any),
+    withdrawV1Stake: (index: number) =>
+      writeContractAsync({ abi: STAKE_ABI, address: stakeV1Addr, functionName: "withdraw", args: [BigInt(index)] } as any),
+    earlyUnstakeV1Stake: (index: number) =>
+      writeContractAsync({ abi: STAKE_ABI, address: stakeV1Addr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
+    claimV1Reward: () =>
+      writeContractAsync({ abi: STAKE_ABI, address: stakeV1Addr, functionName: "claimReward", args: [] } as any),
+    withdrawV1Mine: (index: number) =>
+      writeContractAsync({ abi: MINE_ABI, address: mineV1Addr, functionName: "withdraw", args: [BigInt(index)] } as any),
+    earlyUnstakeV1Mine: (index: number) =>
+      writeContractAsync({ abi: MINE_ABI, address: mineV1Addr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
+    claimV1MineRewards: () =>
+      writeContractAsync({ abi: MINE_ABI, address: mineV1Addr, functionName: "claimRewards", args: [] } as any),
+    migrateV1Stake: (index: number) =>
+      writeContractAsync({ abi: STAKE_ABI, address: stakeV1Addr, functionName: "migrateTo", args: [hNobtCoreAddr, BigInt(index)] } as any),
+    migrateV1Mine: (index: number) =>
+      writeContractAsync({ abi: MINE_ABI, address: mineV1Addr, functionName: "migrateTo", args: [broilerCoreAddr, BigInt(index)] } as any),
     depositVault: (amt: string) =>
       writeContractAsync({ abi: STAKE_ABI, address: vaultAddr, functionName: "stake", args: [BigInt(amt), 1] } as any),
     buyListing: (id: number, value: string) =>
       writeContractAsync({ abi: MARKETPLACE_ABI, address: marketAddr, functionName: "buy", args: [BigInt(id)] } as any),
+    approveCoreHnobt: (amt: string) =>
+      writeContractAsync({ abi: ERC20_ABI, address: hNOBT, functionName: "approve", args: [hNobtCoreAddr, BigInt(amt)] } as any),
+    stakeCoreHnobt: (amt: string, lockPeriod: number) =>
+      writeContractAsync({ abi: STAKE_ABI, address: hNobtCoreAddr, functionName: "stake", args: [BigInt(amt), lockPeriod] } as any),
+    approveCoreLP: (amt: string) =>
+      writeContractAsync({ abi: ERC20_ABI, address: brtLP, functionName: "approve", args: [broilerCoreAddr, BigInt(amt)] } as any),
+    stakeCoreLP: (amt: string, lockPeriod: number, referrer?: string) =>
+      writeContractAsync({ abi: MINE_ABI, address: broilerCoreAddr, functionName: "stake", args: [BigInt(amt), lockPeriod, referrer || "0x0000000000000000000000000000000000000000"] } as any),
     marketplaceReady: isReal(marketAddr),
     marketAddr,
     marketABI: MARKETPLACE_ABI,
-    stakeAddr,
-    mineAddr,
+    hNobtCoreAddr,
+    broilerCoreAddr,
     hNOBT,
     brtLP,
+    hNOBTCoreAllowance: hNOBTCoreAllowance?.toString() ?? "0",
+    lpCoreAllowance: lpCoreAllowance?.toString() ?? "0",
     STAKE_ABI,
     MINE_ABI,
   };

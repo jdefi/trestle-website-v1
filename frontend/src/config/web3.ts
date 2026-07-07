@@ -7,10 +7,10 @@ import { createAppKit } from "@reown/appkit/react";
 export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
 
 const polygonTransports = [
-  http("https://polygon.llamarpc.com", { retryCount: 3, retryDelay: 1000 }),
-  http("https://polygon-rpc.com", { retryCount: 3, retryDelay: 1000 }),
-  http("https://rpc.ankr.com/polygon", { retryCount: 3, retryDelay: 1000 }),
   http("https://polygon-bor-rpc.publicnode.com", { retryCount: 3, retryDelay: 1000 }),
+  http("https://rpc.ankr.com/polygon", { retryCount: 3, retryDelay: 1000 }),
+  http("https://1rpc.io/matic", { retryCount: 3, retryDelay: 1000 }),
+  http("https://polygon.drpc.org", { retryCount: 3, retryDelay: 1000 }),
 ];
 
 const wagmiAdapter = new WagmiAdapter({
