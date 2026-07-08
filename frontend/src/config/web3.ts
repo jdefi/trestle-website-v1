@@ -29,7 +29,7 @@ createAppKit({
   projectId,
   networks: [polygon],
   defaultNetwork: polygon,
-  reconnectOnLoad: false,
+  enableReconnect: false,
   metadata: {
     name: "Trestle DeFi",
     description: "Trestle DeFi — Stake, Earn, and Own",
