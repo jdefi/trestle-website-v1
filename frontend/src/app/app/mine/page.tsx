@@ -276,7 +276,7 @@ export default function MinePage() {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500">Pending xGov:</span>
-            <span className="font-semibold text-emerald-600">{fmt((Number(coreEarnedXgov || 0) / 1e18).toFixed(2))}</span>
+            <span className="font-semibold text-emerald-600">{fmt(Number(coreEarnedXgov || 0))}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500">Core contract:</span>
@@ -289,7 +289,7 @@ export default function MinePage() {
         <div className="flex gap-2">
           <button onClick={handleClaimRewards} disabled={busy}
             className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg disabled:opacity-40 transition text-xs"
-          >{busy ? "Processing..." : `Claim ${(Number(coreEarnedBrt || 0) / 1e9).toFixed(6)} BRT + ${(Number(coreEarnedXgov || 0) / 1e18).toFixed(2)} xGov`}</button>
+          >{busy ? "Processing..." : `Claim ${(Number(coreEarnedBrt || 0) / 1e9).toFixed(6)} BRT + ${Number(coreEarnedXgov || 0)} xGov`}</button>
           <button onClick={() => setModalOpen(true)} disabled={!isConnected}
             className="flex-1 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl disabled:opacity-40 transition"
           >{isConnected ? "Stake LP" : "Connect Wallet"}</button>
@@ -396,7 +396,7 @@ export default function MinePage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Pending xGov points:</span>
-                <span className="font-medium text-emerald-600">{fmt((Number(coreEarnedXgov || 0) / 1e18).toFixed(2))}</span>
+                <span className="font-medium text-emerald-600">{fmt(Number(coreEarnedXgov || 0))}</span>
               </div>
               <p className="text-[10px] text-gray-400 text-right">Updates every 10s</p>
             </div>

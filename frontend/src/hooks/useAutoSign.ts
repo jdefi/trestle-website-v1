@@ -16,10 +16,10 @@ export function useAutoSign() {
     try {
       if (sessionStorage.getItem(KEY) === address.toLowerCase()) return;
     } catch { return; }
+    try { sessionStorage.setItem(KEY, address.toLowerCase()); } catch {}
     const msg = `trestle:${address.toLowerCase()}:${Date.now()}`;
     signMessageAsync({ message: msg }).then((sig) => {
       try {
-        sessionStorage.setItem(KEY, address.toLowerCase());
         sessionStorage.setItem("trestle_sig", sig);
       } catch {}
     }).catch(() => {});

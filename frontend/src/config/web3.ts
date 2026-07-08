@@ -20,6 +20,7 @@ const wagmiAdapter = new WagmiAdapter({
     [polygon.id]: fallback(polygonTransports, { rank: true }),
   },
   ssr: true,
+  autoConnect: false,
 });
 
 export const config = wagmiAdapter.wagmiConfig;
@@ -29,6 +30,7 @@ createAppKit({
   projectId,
   networks: [polygon],
   defaultNetwork: polygon,
+  reconnectOnLoad: false,
   metadata: {
     name: "Trestle DeFi",
     description: "Trestle DeFi — Stake, Earn, and Own",
