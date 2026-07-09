@@ -4,6 +4,15 @@ import { LINKS } from "@/config/contracts";
 
 export const metadata: Metadata = {
   title: "Trestle dApp | Stake, Mine & Vault",
+  description: "Stake hNOBT, mine BRT/WPOL LP liquidity, and access the Governance Vault on Polygon.",
+  twitter: {
+    card: "summary_large_image",
+    site: "@trestleDeFi",
+    creator: "@trestleDeFi",
+    title: "Trestle DeFi | dApp",
+    description: "Stake hNOBT, mine BRT/WPOL LP liquidity, and access the Governance Vault on Polygon.",
+    images: ["/assets/twitter_card.png"],
+  },
 };
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {

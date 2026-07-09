@@ -33,6 +33,7 @@ npm start
 - **Reward Hub**: [Reward Hub](https://reward.trestle.website)
 - **GitHub**: [Trestle DeFi](https://github.com/Trestle-DeFi)
 - **Documentation**: [https://docs.trestle.website](https://docs.trestle.website)
+- **X (Twitter)**: [Trestle DeFi](https://x.com/Trestle_0xArch)
 - **Medium**: [Trestle DeFi](https://medium.com/@trestle_defi)
 - **Discord**: [Trestle DeFi](https://discord.gg/4dCCvnJYGT)
 - **Telegram**: [trestleDeFi](https://t.me/trestleDeFi)

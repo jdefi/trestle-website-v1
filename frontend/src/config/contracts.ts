@@ -17,6 +17,7 @@ export const CONTRACTS = {
 };
 
 export const LINKS = {
+  x: "https://x.com/Trestle_0xArch",
   telegram: "https://t.me/trestleDeFi",
   discord: "https://discord.gg/4dCCvnJYGT",
   github: "https://github.com/Trestle-DeFi",

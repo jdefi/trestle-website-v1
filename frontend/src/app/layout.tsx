@@ -33,6 +33,14 @@ export const metadata: Metadata = {
     type: "website",
     images: ["/logo.svg"],
   },
+  twitter: {
+    card: "summary_large_image",
+    site: "@trestleDeFi",
+    creator: "@trestleDeFi",
+    title: "Trestle DeFi | Decentralized Marketplace",
+    description: "The economic bridge between digital labor and real-world assets on Polygon. Stake, mine liquidity, and trade fractional RWAs.",
+    images: ["/assets/twitter_card.png"],
+  },
   robots: {
     index: true,
     follow: true,
