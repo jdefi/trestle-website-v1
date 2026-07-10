@@ -5,6 +5,13 @@ import { LINKS } from "@/config/contracts";
 export const metadata: Metadata = {
   title: "Trestle dApp | Stake, Mine & Vault",
   description: "Stake hNOBT, mine BRT/WPOL LP liquidity, and access the Governance Vault on Polygon.",
+  openGraph: {
+    title: "Trestle DeFi | dApp",
+    description: "Stake hNOBT, mine BRT/WPOL LP liquidity, and access the Governance Vault on Polygon.",
+    type: "website",
+    url: "https://trestle.website",
+    images: ["/assets/twitter_card.png"],
+  },
   twitter: {
     card: "summary_large_image",
     site: "@trestleDeFi",

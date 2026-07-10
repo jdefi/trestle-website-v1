@@ -31,7 +31,8 @@ export const metadata: Metadata = {
     title: "Trestle DeFi",
     description: "A self-sustaining economic bridge between the gig economy and real-world assets.",
     type: "website",
-    images: ["/logo.svg"],
+    url: "https://trestle.website",
+    images: ["/assets/twitter_card.png"],
   },
   twitter: {
     card: "summary_large_image",
