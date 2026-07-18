@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useAccount, useSignMessage } from "wagmi";
 import QRCodeLib from "qrcode";
 import { SITE_URL } from "@/config/contracts";
 
@@ -58,22 +57,4 @@ export default function QRCode({
       </p>
     </div>
   );
-}
-
-export function useWalletSign() {
-  const { address, isConnected } = useAccount();
-  const { signMessageAsync } = useSignMessage();
-  const [signed, setSigned] = useState(false);
-
-  useEffect(() => {
-    if (isConnected && address && !signed) {
-      signMessageAsync({
-        message: `Welcome to Trestle DeFi! This message confirms your identity. Nonce: ${Date.now()}`,
-      })
-        .then(() => setSigned(true))
-        .catch(() => {});
-    }
-  }, [isConnected, address, signed, signMessageAsync]);
-
-  return { signed };
 }

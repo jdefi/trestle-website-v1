@@ -34,7 +34,7 @@ createAppKit({
     name: "Trestle DeFi",
     description: "Trestle DeFi — Stake, Earn, and Own",
     url: "https://trestle.website",
-    icons: ["/favicon.ico"],
+    icons: ["https://trestle.website/favicon.svg"],
   },
   allowUnsupportedChain: true,
   features: {
