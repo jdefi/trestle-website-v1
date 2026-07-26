@@ -5,9 +5,11 @@ import { useAccount, useReadContract } from "wagmi";
 import { getPublicClient } from "wagmi/actions";
 import { parseAbiItem, isAddress } from "viem";
 import { useContracts, LOCKDOWN_24H_SECONDS } from "@/hooks/useContracts";
-import { CONTRACTS, DEFAULT_REFERRER } from "@/config/contracts";
+import { CONTRACTS, DEFAULT_REFERRER, DEPLOY_BLOCKS } from "@/config/contracts";
 import { config } from "@/config/web3";
 import { polygon } from "viem/chains";
+import toast from "react-hot-toast";
+import { copyToClipboard } from "@/lib/clipboard";
 
 const ERC20_ABI = [
   { inputs: [{ name: "account", type: "address" }], name: "balanceOf", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
@@ -26,7 +28,7 @@ const MINE_STAKED = parseAbiItem("event Staked(address indexed user, uint256 ind
 const MINE_WITHDRAWN = parseAbiItem("event Withdrawn(address indexed user, uint256 index, uint256 amount)");
 const MINE_EARLY = parseAbiItem("event EarlyUnstaked(address indexed user, uint256 index, uint256 amount, uint256 rewardPenalty)");
 
-const DEPLOY_BLOCK = 89365000n;
+const DEPLOY_BLOCK = DEPLOY_BLOCKS.broilerCoreStaking;
 
 const MINE_LOCKS: Record<number, { label: string; duration: number; mult: string; multVal: number }> = {
   1: { label: "6 months", duration: 180 * 86400, mult: "1.4x", multVal: 14000 },
@@ -117,8 +119,8 @@ export default function MinePage() {
     return () => clearInterval(timer);
   }, []);
 
-  const copyAddr = (label: string, value: string) => {
-    navigator.clipboard.writeText(value);
+  const copyAddr = async (label: string, value: string) => {
+    await copyToClipboard(value);
     setCopiedAddr(label);
     setTimeout(() => setCopiedAddr(null), 2000);
   };
@@ -212,7 +214,7 @@ export default function MinePage() {
     if (!amount || busy) return;
     setBusy(true);
     try { await approveCoreLP(parsedAmt.toString()); }
-    catch (e: any) { alert(e.message); }
+    catch (e: any) { toast.error(e.message); }
     setBusy(false);
   };
 
@@ -222,28 +224,28 @@ export default function MinePage() {
     try {
       await stakeCoreLP(parsedAmt.toString(), duration.lockPeriod, referrer || DEFAULT_REFERRER);
       setAmount(""); setModalOpen(false);
-    } catch (e: any) { alert(e.message); }
+    } catch (e: any) { toast.error(e.message); }
     setBusy(false);
   };
 
   const handleClaimRewards = async () => {
     setBusy(true);
     try { await claimRewardsMine(); }
-    catch (e: any) { alert(e.message); }
+    catch (e: any) { toast.error(e.message); }
     setBusy(false);
   };
 
   const handleWithdraw = async (index: number) => {
     setBusyAction({ type: "withdraw", index });
     try { await withdrawMine(index); }
-    catch (e: any) { alert(e.message); }
+    catch (e: any) { toast.error(e.message); }
     setBusyAction(null);
   };
 
   const handleEarlyUnstake = async (index: number) => {
     setBusyAction({ type: "earlyUnstake", index });
     try { await earlyUnstakeMine(index); }
-    catch (e: any) { alert(e.message); }
+    catch (e: any) { toast.error(e.message); }
     setBusyAction(null);
   };
 

@@ -21,7 +21,6 @@ const STAKE_ABI = [
   { inputs: [], name: "claimReward", outputs: [], type: "function", stateMutability: "nonpayable" },
   { inputs: [{ name: "_account", type: "address" }], name: "earned", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [], name: "LOCKDOWN_24H", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
-  { inputs: [], name: "LOCKDOWN_24H", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [], name: "LOCK_3M", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [], name: "LOCK_6M", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
   { inputs: [], name: "LOCK_12M", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
@@ -41,22 +40,11 @@ const MINE_ABI = [
   { inputs: [], name: "LOCKDOWN_24H", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
 ] as const;
 
-const MARKETPLACE_ABI = [
-  { inputs: [{ name: "listingId", type: "uint256" }], name: "buy", outputs: [], type: "function", stateMutability: "payable" },
-  { inputs: [{ name: "listingId", type: "uint256" }], name: "getListing", outputs: [{ name: "seller", type: "address" }, { name: "price", type: "uint256" }, { name: "active", type: "bool" }], type: "function", stateMutability: "view" },
-  { inputs: [], name: "listingCount", outputs: [{ name: "", type: "uint256" }], type: "function", stateMutability: "view" },
-] as const;
-
-const PLACEHOLDER = "0x...";
-const isReal = (a: string | undefined) => !!a && a !== PLACEHOLDER && !a.startsWith("0x0000");
-
 export const LOCKDOWN_24H_SECONDS = 86400;
 
 const hNOBT = CONTRACTS.mainnet.hNOBT as Address;
 const brt = CONTRACTS.mainnet.broilerPlus as Address;
 const brtLP = CONTRACTS.mainnet.brtLP as Address;
-const vaultAddr = CONTRACTS.mainnet.vaultStaking as Address;
-const marketAddr = CONTRACTS.mainnet.marketplaceCore as Address;
 const hNobtCoreAddr = CONTRACTS.mainnet.hNobtCoreStaking as Address;
 const broilerCoreAddr = CONTRACTS.mainnet.broilerCoreStaking as Address;
 
@@ -70,8 +58,8 @@ export function useContracts() {
 
   const { writeContractAsync } = useWriteContract();
 
-  const { data: hNOBTCoreAllowance } = useReadContract({ abi: ERC20_ABI, address: hNOBT, functionName: "allowance", args: address ? [address, hNobtCoreAddr] : undefined, query: { enabled: !!address } });
-  const { data: lpCoreAllowance } = useReadContract({ abi: ERC20_ABI, address: brtLP, functionName: "allowance", args: address ? [address, broilerCoreAddr] : undefined, query: { enabled: !!address } });
+  const { data: hNOBTCoreAllowance } = useReadContract({ abi: ERC20_ABI, address: hNOBT, functionName: "allowance", args: address ? [address, hNobtCoreAddr] : undefined, query: { enabled: !!address, refetchInterval: 5000 } });
+  const { data: lpCoreAllowance } = useReadContract({ abi: ERC20_ABI, address: brtLP, functionName: "allowance", args: address ? [address, broilerCoreAddr] : undefined, query: { enabled: !!address, refetchInterval: 5000 } });
 
   return {
     address,
@@ -92,10 +80,6 @@ export function useContracts() {
       writeContractAsync({ abi: MINE_ABI, address: broilerCoreAddr, functionName: "withdraw", args: [BigInt(index)] } as any),
     earlyUnstakeMine: (index: number) =>
       writeContractAsync({ abi: MINE_ABI, address: broilerCoreAddr, functionName: "earlyUnstake", args: [BigInt(index)] } as any),
-    depositVault: (amt: string) =>
-      writeContractAsync({ abi: STAKE_ABI, address: vaultAddr, functionName: "stake", args: [BigInt(amt), 1] } as any),
-    buyListing: (id: number, value: string) =>
-      writeContractAsync({ abi: MARKETPLACE_ABI, address: marketAddr, functionName: "buy", args: [BigInt(id)] } as any),
     approveCoreHnobt: (amt: string) =>
       writeContractAsync({ abi: ERC20_ABI, address: hNOBT, functionName: "approve", args: [hNobtCoreAddr, BigInt(amt)] } as any),
     stakeCoreHnobt: (amt: string, lockPeriod: number) =>
@@ -104,9 +88,6 @@ export function useContracts() {
       writeContractAsync({ abi: ERC20_ABI, address: brtLP, functionName: "approve", args: [broilerCoreAddr, BigInt(amt)] } as any),
     stakeCoreLP: (amt: string, lockPeriod: number, referrer?: string) =>
       writeContractAsync({ abi: MINE_ABI, address: broilerCoreAddr, functionName: "stake", args: [BigInt(amt), lockPeriod, referrer || "0x0000000000000000000000000000000000000000"] } as any),
-    marketplaceReady: isReal(marketAddr),
-    marketAddr,
-    marketABI: MARKETPLACE_ABI,
     hNobtCoreAddr,
     broilerCoreAddr,
     hNOBT,

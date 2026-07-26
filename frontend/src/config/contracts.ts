@@ -7,13 +7,14 @@ export const CONTRACTS = {
     hNOBT: "0xcF51ab7398315DbA6588Aa7fb3Df7c99D3D1F4dD",
     broilerPlus: "0xeCb4cAc0C9e5cBd42a9Ed36467ce8f96072AD58b",
     brtLP: "0xc445b18b3ff85e0691fe416ad91e456f8697b166",
-    vaultStaking: "0x...",
-    governanceToken: "0x...",
-    feeDistributor: "0x...",
     hNobtCoreStaking: "0x1d7d8a7B24Be9ecc692f36c7C01486EfF6c689d7",
     broilerCoreStaking: "0xF68A17c7e15174D55AFDb2EF7669Ad04F561AD48",
-    marketplaceCore: "0x...",
   },
+};
+
+export const DEPLOY_BLOCKS = {
+  hNobtCoreStaking: 89365000n,
+  broilerCoreStaking: 89365000n,
 };
 
 export const LINKS = {

@@ -34,7 +34,7 @@ export default function Footer() {
           <h3 className="text-white font-semibold mb-3">Community</h3>
           <ul className="space-y-2 text-sm">
             <li><a href={LINKS.x} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Icon name="x" size={14} /> X (Twitter)</a></li>
-            <li><a href={LINKS.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Icon name="telegram" size={14} /> Telegram</a></li>
+            <li><a href="https://bsky.app/profile/trestle-0xarch.bsky.social" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Icon name="bluesky" size={14} /> Bluesky</a></li>
             <li><a href={LINKS.medium} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Icon name="medium" size={14} /> Medium</a></li>
             <li><a href={LINKS.whitepaper} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Icon name="file-text" size={14} /> Whitepaper</a></li>
           </ul>

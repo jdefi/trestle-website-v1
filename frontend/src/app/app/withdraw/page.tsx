@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAccount, useBalance } from "wagmi";
 import { useContracts } from "@/hooks/useContracts";
+import toast from "react-hot-toast";
 
 const fmt = (n: string | number) => Number(n).toLocaleString("en-US");
 
@@ -19,8 +20,8 @@ export default function WithdrawPage() {
     try {
       const amount = prompt("Enter MATIC amount to withdraw:", "0");
       if (!amount) return;
-      alert("MATIC withdrawal via wallet interaction coming soon");
-    } catch (e: any) { alert(e.message); }
+      toast("MATIC withdrawal via wallet interaction coming soon");
+    } catch (e: any) { toast.error(e.message); }
     setBusy(null);
   };
 

@@ -15,7 +15,7 @@ type HealthStatus = {
 type Strategy = "latency" | "healthy" | "round-robin";
 
 const DEFAULT_STRATEGY: Strategy = "latency";
-const HEALTH_CHECK_INTERVAL = 30_000;
+const HEALTH_CHECK_INTERVAL = 120_000;
 const TIMEOUT_MS = 5_000;
 
 const RPCS: Record<number, RpcConfig[]> = {
@@ -67,10 +67,20 @@ class MultiRpcProvider {
   private health: Map<string, HealthStatus> = new Map();
   private rrIndex = 0;
   private timer: ReturnType<typeof setInterval> | null = null;
+  private paused = false;
 
   constructor(private chainId: number, private strategy: Strategy = DEFAULT_STRATEGY) {
     this.checkHealth();
-    this.timer = setInterval(() => this.checkHealth(), HEALTH_CHECK_INTERVAL);
+    this.timer = setInterval(() => {
+      if (!this.paused) this.checkHealth();
+    }, HEALTH_CHECK_INTERVAL);
+
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", () => {
+        this.paused = document.hidden;
+        if (!this.paused) this.checkHealth();
+      });
+    }
   }
 
   private checkHealth = async () => {
@@ -139,7 +149,10 @@ class MultiRpcProvider {
   }
 
   setStrategy(s: Strategy) { this.strategy = s; }
-  destroy() { if (this.timer) clearInterval(this.timer); }
+  destroy() {
+    if (this.timer) clearInterval(this.timer);
+    this.paused = true;
+  }
 }
 
 const instances = new Map<number, MultiRpcProvider>();

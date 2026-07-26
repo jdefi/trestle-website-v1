@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useContracts } from "@/hooks/useContracts";
 import QRCode from "@/components/QRCode";
+import { copyToClipboard } from "@/lib/clipboard";
 
 const fmt = (n: string | number) => Number(n).toLocaleString("en-US");
 
@@ -18,9 +19,9 @@ export default function AppDashboard() {
   const refLink = address ? `${REF_BASE}${address}` : "";
   const maskedRefLink = address ? `${REF_BASE}mask_${btoa(address).slice(0, 12)}` : "";
 
-  const copyRef = (field: string, value: string) => {
+  const copyRef = async (field: string, value: string) => {
     if (!value) return;
-    navigator.clipboard.writeText(value);
+    await copyToClipboard(value);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
   };

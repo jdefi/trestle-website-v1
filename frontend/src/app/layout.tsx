@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AstraChatWrapper from "@/components/AstraChatWrapper";
 import TOSModal from "@/components/TOSModal";
+import { Toaster } from "react-hot-toast";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="scroll-smooth">
       <body className="min-h-screen bg-white text-gray-900 antialiased">
         <Providers>
+          <Toaster position="top-right" />
           <Navbar />
           <main>{children}</main>
           <Footer />

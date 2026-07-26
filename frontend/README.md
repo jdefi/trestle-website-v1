@@ -37,5 +37,5 @@ npm start
 - **Medium**: [Trestle DeFi](https://medium.com/@trestle_defi)
 - **Discord**: [Trestle DeFi](https://discord.gg/4dCCvnJYGT)
 - **Telegram**: [trestleDeFi](https://t.me/trestleDeFi)
-- **Telegram App**: [trestlehub_bot](https://t.me/trestlehub_bot)
+- **Telegram App**: [Trestlehub_bot](https://t.me/trestlehub_bot)
 - **Email**: contact@trestle.website

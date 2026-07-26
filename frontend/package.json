@@ -8,25 +8,25 @@
     "start": "next start"
   },
   "dependencies": {
-    "@reown/appkit": "^1.8.21",
-    "@reown/appkit-adapter-wagmi": "^1.8.21",
-    "@tanstack/react-query": "^5.101.1",
-    "next": "^16.2.9",
+    "@reown/appkit": "^1.8.23",
+    "@reown/appkit-adapter-wagmi": "^1.8.23",
+    "@tanstack/react-query": "^5.101.4",
+    "next": "^16.2.12",
     "qrcode": "^1.5.4",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "viem": "^2.53.1",
-    "wagmi": "^2.19.5"
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-hot-toast": "^2.6.0",
+    "viem": "^2.55.8",
+    "wagmi": "^3.7.4"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.1",
-    "@types/minimatch": "^6.0.0",
-    "@types/node": "^26.0.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.1.1",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "autoprefixer": "^10.5.2",
-    "postcss": "^8.5.15",
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.5.23",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3"
   }
