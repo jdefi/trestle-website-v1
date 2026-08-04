@@ -16,8 +16,8 @@ const phases = [
     items: [
       { text: "Decentralized marketplace live", status: "deploying" as const },
       { text: "Fractional RWA tokenization", status: "pending" as const },
-      { text: "Chainlink oracle integration", status: "pending" as const },
-      { text: "Multi-chain expansion", status: "pending" as const },
+      { text: "Chainlink oracle integration", status: "completed" as const },
+      { text: "Multi-chain expansion", status: "completed" as const },
     ],
   },
   {

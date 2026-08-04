@@ -13,7 +13,7 @@ export default function Hero() {
       <div className="relative max-w-7xl mx-auto px-6 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-600 text-sm rounded-full mb-6">
           <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          The Marketplace &mdash; Live on Polygon Amoy Testnet
+          The Marketplace &mdash; Live on Amoy, Arbitrum and Base Testnet
         </div>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 max-w-3xl mx-auto leading-tight mb-6">

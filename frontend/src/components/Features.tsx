@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 const features = [
   {
     title: "Zero-Friction Onboarding",
@@ -20,7 +18,7 @@ const features = [
     color: "emerald",
   },
   {
-    title: "2.5% Marketplace Fee",
+    title: "3% Marketplace Fee",
     desc: "40% to stakers, 40% to treasury, 20% buyback & burn. Sustainable real yield model.",
     icon: "📊",
     color: "blue",
