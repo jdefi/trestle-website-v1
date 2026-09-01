@@ -15,7 +15,7 @@ const phases = [
     date: "Q3 2025 - Q1/Q2 2026",
     items: [
       { text: "Decentralized marketplace live", status: "deploying" as const },
-      { text: "Fractional RWA tokenization", status: "pending" as const },
+      { text: "Fractional RWA tokenization", status: "completed" as const },
       { text: "Chainlink oracle integration", status: "completed" as const },
       { text: "Multi-chain expansion", status: "completed" as const },
     ],
@@ -23,7 +23,7 @@ const phases = [
   {
     phase: "Phase 3",
     title: "The Flywheel",
-    date: "Q2 2026",
+    date: "Q3 2026",
     items: [
       { text: "Stake hNOBT, mine BRT via LP staking", status: "completed" as const },
       { text: "BroilerPlus LP mining program", status: "completed" as const },
@@ -39,7 +39,7 @@ const phases = [
       { text: "Cross-chain bridges", status: "pending" as const },
       { text: "Institutional RWA partnerships", status: "pending" as const },
       { text: "AI-powered freelancer tools", status: "completed" as const },
-      { text: "Self-sustaining economic flywheel", status: "pending" as const },
+      { text: "Self-sustaining economic flywheel", status: "completed" as const },
     ],
   },
 ];
